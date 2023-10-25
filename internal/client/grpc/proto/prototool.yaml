@@ -1,0 +1,18 @@
+protoc:
+  version: 3.21.12
+lint:
+  group: uber2
+generate:
+  go_options:
+    import_path: go-test-grpc-http/internal/api/grpc/proto
+  plugins:
+    - name: go
+      type: go
+      output: ../gen
+    - name: go-grpc
+      type: go
+      output: ../gen
+    - name: validate
+      type: go
+      flags: lang=go
+      output: ../gen

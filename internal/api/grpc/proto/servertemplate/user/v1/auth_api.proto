@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package servertemplate.user.v1;
+
+option csharp_namespace = "Servertemplate.User.V1";
+option go_package = "servertemplate/user/v1;userv1";
+option java_multiple_files = true;
+option java_outer_classname = "AuthApiProto";
+option java_package = "com.servertemplate.user.v1";
+option objc_class_prefix = "SUX";
+option php_namespace = "Servertemplate\\User\\V1";
+
+import "servertemplate/user/v1/user.proto";
+
+// Сервис авторизации пользователя.
+service AuthAPI {
+  // Регистрация нового пользователя.
+  rpc SignUp(SignUpRequest) returns (SignUpResponse);
+  // Вход в систему пользователя.
+  rpc SignIn(SignInRequest) returns (SignInResponse);
+}
+
+message SignUpRequest {
+  UserCreate user = 1;
+}
+
+message SignUpResponse {
+  string token = 1;
+}
+
+message SignInRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message SignInResponse {
+  string token = 1;
+}

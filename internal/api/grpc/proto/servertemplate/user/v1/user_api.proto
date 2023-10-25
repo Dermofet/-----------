@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package servertemplate.user.v1;
+
+option csharp_namespace = "Servertemplate.User.V1";
+option go_package = "servertemplate/user/v1;userv1";
+option java_multiple_files = true;
+option java_outer_classname = "UserApiProto";
+option java_package = "com.servertemplate.user.v1";
+option objc_class_prefix = "SUX";
+option php_namespace = "Servertemplate\\User\\V1";
+
+import "servertemplate/user/v1/user.proto";
+
+// UserAPI сервис получения информации о пользователях.
+service UserAPI {
+  // Получение информации о пользователе по ID из JWT токена.
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  // Обновление информации о пользователе из JWT токена.
+  rpc UpdateMe(UpdateMeRequest) returns (UpdateMeResponse);
+  // Удаление информации о пользователе из JWT токена.
+  rpc DeleteMe(DeleteMeRequest) returns (DeleteMeResponse);
+  // Получение пользователя по ID.
+  rpc GetById(GetByIdRequest) returns (GetByIdResponse);
+  // Получение пользователя по Email.
+  rpc GetByEmail(GetByEmailRequest) returns (GetByEmailResponse);
+  // Обновление информации о пользователе.
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  // Удаление пользователя.
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  UserDB user = 1;
+}
+
+message UpdateMeRequest {
+  UserUpdate user = 1;
+}
+
+message UpdateMeResponse {
+  UserDB user = 1;
+}
+
+message DeleteMeRequest {
+  string id = 1;
+}
+
+message DeleteMeResponse {}
+
+message GetByIdRequest {
+  string id = 1;
+}
+
+message GetByIdResponse {
+  UserDB user = 1;
+}
+
+message GetByEmailRequest {
+  string email = 1;
+}
+
+message GetByEmailResponse {
+  UserDB user = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  UserCreate user = 2;
+}
+
+message UpdateResponse {
+  UserDB user = 1;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message DeleteResponse {}

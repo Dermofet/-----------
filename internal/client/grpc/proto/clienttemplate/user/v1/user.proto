@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package clienttemplate.user.v1;
+
+option csharp_namespace = "Clienttemplate.User.V1";
+option go_package = "clienttemplate/user/v1;userv1";
+option java_multiple_files = true;
+option java_outer_classname = "UserProto";
+option java_package = "com.clienttemplate.user.v1";
+option objc_class_prefix = "CUX";
+option php_namespace = "Clienttemplate\\User\\V1";
+
+// Пользователь.
+message User {
+  // ID пользователя
+  string id = 1;
+  // Фамилия
+  string last_name = 2;
+  // Имя
+  string first_name = 3;
+  // Отчество
+  string second_name = 4;
+  // Возраст
+  int32 age = 5;
+  // Пароль
+  string password = 6;
+  // E-mail
+  string email = 7;
+  // Телефон
+  string phone = 8;
+}

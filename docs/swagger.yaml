@@ -1,0 +1,346 @@
+basePath: /api/v0.0.1
+definitions:
+  entity.UserCreate:
+    properties:
+      age:
+        description: Возраст
+        type: integer
+      email:
+        description: Электронная почта
+        type: string
+      firstName:
+        description: Имя
+        type: string
+      lastName:
+        description: Фамилия
+        type: string
+      password:
+        description: Пароль
+        type: string
+      phone:
+        description: Номер телефона
+        type: string
+      secondName:
+        description: Отчество
+        type: string
+    type: object
+  entity.UserSignIn:
+    properties:
+      email:
+        description: Электронная почта
+        type: string
+      password:
+        description: Пароль
+        type: string
+    type: object
+  view.TokenView:
+    properties:
+      token:
+        description: JWT токен
+        type: string
+    type: object
+  view.UserView:
+    properties:
+      age:
+        description: Возраст
+        type: integer
+      email:
+        description: Электронная почта
+        type: string
+      id:
+        description: ID
+        type: string
+      name:
+        description: Имя в формате ФИО
+        type: string
+      phone:
+        description: Номер мобильного телефона
+        type: string
+    type: object
+host: localhost:8001
+info:
+  contact:
+    name: Invar Poyda
+  description: API for Golang Test Project
+  termsOfService: http://swagger.io/terms/
+  title: Golang Test API
+  version: 0.0.1
+paths:
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация пользователя с использованием email и пароля.
+      parameters:
+      - description: Данные пользователя для входа
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserSignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Токен авторизации
+          schema:
+            $ref: '#/definitions/view.TokenView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Ошибка авторизации
+        "422":
+          description: Ошибка при обработке данных
+        "500":
+          description: Внутренняя ошибка сервера
+      summary: Вход пользователя
+      tags:
+      - Auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя.
+      parameters:
+      - description: Данные пользователя для регистрации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Токен авторизации
+          schema:
+            $ref: '#/definitions/view.TokenView'
+        "400":
+          description: Некорректный запрос
+        "422":
+          description: Ошибка при обработке данных
+        "500":
+          description: Внутренняя ошибка сервера
+      summary: Регистрация пользователя
+      tags:
+      - Auth
+  /users/email/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его уникальному идентификатору.
+      parameters:
+      - description: Email пользователя
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение пользователя по Email
+      tags:
+      - Users
+  /users/id/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление пользователя по его уникальному идентификатору.
+      parameters:
+      - description: Уникальный идентификатор пользователя (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: Пользователь успешно удален
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Удаление пользователя по ID
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его уникальному идентификатору.
+      parameters:
+      - description: Уникальный идентификатор пользователя (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение пользователя по ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Обновление информации о пользователе по его уникальному идентификатору.
+      parameters:
+      - description: Уникальный идентификатор пользователя (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные пользователя для обновления
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленные данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "422":
+          description: Ошибка при обработке данных
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Обновление пользователя по ID
+      tags:
+      - Users
+  /users/me:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление пользователя по его уникальному идентификатору из JWT
+        токена.
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: Пользователь успешно удален
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Удаление пользователя по JWT токену
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Получение пользователя по его уникальному идентификатору из JWT
+        токена
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение пользователя по JWT токену
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Обновление информации о пользователе по его уникальному идентификатору
+        из JWT токена
+      parameters:
+      - description: Данные пользователя для обновления
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленные данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "422":
+          description: Ошибка при обработке данных
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Обновление пользователя по JWT токену
+      tags:
+      - Users
+schemes:
+- http
+securityDefinitions:
+  JwtAuth:
+    description: JWT Bearer токен для аутентификации
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
