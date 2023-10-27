@@ -1,36 +1,11 @@
-basePath: /api/v0.0.1
 definitions:
   entity.UserCreate:
     properties:
-      age:
-        description: Возраст
-        type: integer
-      email:
-        description: Электронная почта
-        type: string
-      firstName:
-        description: Имя
-        type: string
-      lastName:
-        description: Фамилия
-        type: string
       password:
         description: Пароль
         type: string
-      phone:
-        description: Номер телефона
-        type: string
-      secondName:
-        description: Отчество
-        type: string
-    type: object
-  entity.UserSignIn:
-    properties:
-      email:
-        description: Электронная почта
-        type: string
-      password:
-        description: Пароль
+      username:
+        description: Имя пользователя
         type: string
     type: object
   view.TokenView:
@@ -41,26 +16,17 @@ definitions:
     type: object
   view.UserView:
     properties:
-      age:
-        description: Возраст
-        type: integer
-      email:
-        description: Электронная почта
-        type: string
       id:
         description: ID
         type: string
       name:
-        description: Имя в формате ФИО
-        type: string
-      phone:
-        description: Номер мобильного телефона
+        description: Имя пользователя
         type: string
     type: object
-host: localhost:8001
+host: localhost:8000
 info:
   contact:
-    name: Invar Poyda
+    name: Dermofet3_3
   description: API for Golang Test Project
   termsOfService: http://swagger.io/terms/
   title: Golang Test API
@@ -70,14 +36,15 @@ paths:
     post:
       consumes:
       - application/json
-      description: Авторизация пользователя с использованием email и пароля.
+      description: Авторизация пользователя с использованием имени пользователя и
+        пароля.
       parameters:
       - description: Данные пользователя для входа
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.UserSignIn'
+          $ref: '#/definitions/entity.UserCreate'
       produces:
       - application/json
       responses:
@@ -124,38 +91,7 @@ paths:
       summary: Регистрация пользователя
       tags:
       - Auth
-  /users/email/{email}:
-    get:
-      consumes:
-      - application/json
-      description: Получение информации о пользователе по его уникальному идентификатору.
-      parameters:
-      - description: Email пользователя
-        in: path
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Данные пользователя
-          schema:
-            $ref: '#/definitions/view.UserView'
-        "400":
-          description: Некорректный запрос
-        "401":
-          description: Неавторизованный запрос
-        "404":
-          description: Пользователь не найден
-        "500":
-          description: Внутренняя ошибка сервера
-      security:
-      - JwtAuth: []
-      summary: Получение пользователя по Email
-      tags:
-      - Users
-  /users/id/{id}:
+  /users/{id}:
     delete:
       consumes:
       - application/json
@@ -250,6 +186,37 @@ paths:
       security:
       - JwtAuth: []
       summary: Обновление пользователя по ID
+      tags:
+      - Users
+  /users/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его уникальному идентификатору.
+      parameters:
+      - description: Username пользователя
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение пользователя по Username
       tags:
       - Users
   /users/me:

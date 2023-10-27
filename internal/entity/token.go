@@ -2,7 +2,7 @@ package entity
 
 import (
 	"fmt"
-	"go-test-grpc-http/cmd/go-test-grpc-http/config"
+	"music-backend-test/cmd/music-backend-test/config"
 	"time"
 
 	"github.com/golang-jwt/jwt"

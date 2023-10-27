@@ -21,39 +21,35 @@ func (u *UserID) FromString(s string) error {
 
 // Представление пользователя в бд
 type UserDB struct {
-	ID         uuid.UUID `db:"id"`          // ID
-	FirstName  string    `db:"first_name"`  // Имя
-	SecondName string    `db:"second_name"` // Отчество
-	LastName   string    `db:"last_name"`   // Фамилия
-	Password   string    `db:"password"`    // Пароль
-	Age        int       `db:"age"`         // Возраст
-	Email      string    `db:"email"`       // Электронная почта
-	Phone      string    `db:"phone"`       // Номер телефона
+	ID       uuid.UUID `db:"id"`       // ID
+	Username string    `db:"username"` // Имя пользователя
+	Password string    `db:"password"` // Пароль
 }
 
+// Представление пользователя
 type User struct {
-	ID         *UserID // ID
-	FirstName  string  // Имя
-	SecondName string  // Отчество
-	LastName   string  // Фамилия
-	Password   string  // Пароль
-	Age        int     // Возраст
-	Email      string  // Электронная почта
-	Phone      string  // Номер телефона
+	ID       *UserID // ID
+	Username string  // Имя пользователя
 }
 
 // Представление пользователя для создания записи в бд
 type UserCreate struct {
-	FirstName  string // Имя
-	SecondName string // Отчество
-	LastName   string // Фамилия
-	Password   string // Пароль
-	Age        int    // Возраст
-	Email      string // Электронная почта
-	Phone      string // Номер телефона
-}
-
-type UserSignIn struct {
-	Email    string // Электронная почта
+	Username string // Имя пользователя
 	Password string // Пароль
 }
+
+// Представление пользователя для создания записи в бд
+// type UserCreate struct {
+// 	FirstName  string // Имя
+// 	SecondName string // Отчество
+// 	LastName   string // Фамилия
+// 	Password   string // Пароль
+// 	Age        int    // Возраст
+// 	Email      string // Электронная почта
+// 	Phone      string // Номер телефона
+// }
+
+// type UserSignIn struct {
+// 	Email    string // Электронная почта
+// 	Password string // Пароль
+// }

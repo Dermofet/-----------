@@ -2,13 +2,13 @@ package http
 
 import (
 	"fmt"
-	"go-test-grpc-http/docs"
-	"go-test-grpc-http/internal/api/http/handlers"
-	"go-test-grpc-http/internal/api/http/middlewares"
-	"go-test-grpc-http/internal/api/http/presenter"
-	"go-test-grpc-http/internal/db"
-	"go-test-grpc-http/internal/repository"
-	"go-test-grpc-http/internal/usecase"
+	"music-backend-test/docs"
+	"music-backend-test/internal/api/http/handlers"
+	"music-backend-test/internal/api/http/middlewares"
+	"music-backend-test/internal/api/http/presenter"
+	"music-backend-test/internal/db"
+	"music-backend-test/internal/repository"
+	"music-backend-test/internal/usecase"
 	"net/http"
 	"time"
 
@@ -80,16 +80,17 @@ func (r *router) registerRoutes() error {
 	basePath := r.router.Group(docs.SwaggerInfo.BasePath)
 
 	basePath.GET("/swagger/swagger.json", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache")
 		c.File("docs/swagger.json")
 	})
 	basePath.GET("/swagger/swagger.yaml", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache")
 		c.File("docs/swagger.yaml")
 	})
 	basePath.GET("/docs/*any", ginSwagger.WrapHandler(
 		swaggerFiles.Handler,
 		ginSwagger.URL("http://"+docs.SwaggerInfo.Host+docs.SwaggerInfo.BasePath+"/swagger/swagger.json"),
-	),
-	)
+	))
 
 	pgSource := db.NewSource(r.db)
 	userRepository := repository.NewUserRepository(pgSource)
@@ -110,7 +111,7 @@ func (r *router) registerRoutes() error {
 		userGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
 		userGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
 		userGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
-		userGroup.GET("/email/:email", r.handlers.userHandlers.GetByEmailHandler)
+		userGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
 		userGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
 		userGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
 	}

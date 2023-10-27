@@ -6,7 +6,7 @@ package usecase
 
 import (
 	context "context"
-	entity "go-test-grpc-http/internal/entity"
+	entity "music-backend-test/internal/entity"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -64,21 +64,6 @@ func (mr *MockUserInteractorMockRecorder) Delete(ctx, id interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUserInteractor)(nil).Delete), ctx, id)
 }
 
-// GetByEmail mocks base method.
-func (m *MockUserInteractor) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
-	ret0, _ := ret[0].(*entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByEmail indicates an expected call of GetByEmail.
-func (mr *MockUserInteractorMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUserInteractor)(nil).GetByEmail), ctx, email)
-}
-
 // GetById mocks base method.
 func (m *MockUserInteractor) GetById(ctx context.Context, id *entity.UserID) (*entity.User, error) {
 	m.ctrl.T.Helper()
@@ -94,19 +79,19 @@ func (mr *MockUserInteractorMockRecorder) GetById(ctx, id interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockUserInteractor)(nil).GetById), ctx, id)
 }
 
-// GetIdByEmail mocks base method.
-func (m *MockUserInteractor) GetIdByEmail(ctx context.Context, email string) (*entity.UserID, error) {
+// GetByUsername mocks base method.
+func (m *MockUserInteractor) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIdByEmail", ctx, email)
-	ret0, _ := ret[0].(*entity.UserID)
+	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
+	ret0, _ := ret[0].(*entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetIdByEmail indicates an expected call of GetIdByEmail.
-func (mr *MockUserInteractorMockRecorder) GetIdByEmail(ctx, email interface{}) *gomock.Call {
+// GetByUsername indicates an expected call of GetByUsername.
+func (mr *MockUserInteractorMockRecorder) GetByUsername(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdByEmail", reflect.TypeOf((*MockUserInteractor)(nil).GetIdByEmail), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockUserInteractor)(nil).GetByUsername), ctx, username)
 }
 
 // Update mocks base method.

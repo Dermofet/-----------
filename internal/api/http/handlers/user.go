@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"go-test-grpc-http/internal/api/http/presenter"
-	_ "go-test-grpc-http/internal/api/http/view"
-	"go-test-grpc-http/internal/entity"
-	"go-test-grpc-http/internal/usecase"
+	"music-backend-test/internal/api/http/presenter"
+	_ "music-backend-test/internal/api/http/view"
+	"music-backend-test/internal/entity"
+	"music-backend-test/internal/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -162,7 +162,7 @@ func (h *userHandlers) DeleteMeHandler(c *gin.Context) {
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Пользователь не найден"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/id/{id} [get]
+// @Router /users/{id} [get]
 func (h *userHandlers) GetByIdHandler(c *gin.Context) {
 	ctx := context.Background()
 
@@ -186,25 +186,25 @@ func (h *userHandlers) GetByIdHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, h.presenter.ToUserView(user))
 }
 
-// GetByEmailHandler godoc
-// @Summary Получение пользователя по Email
+// GetByUsernameHandler godoc
+// @Summary Получение пользователя по Username
 // @Description Получение информации о пользователе по его уникальному идентификатору.
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param email path string true "Email пользователя"
+// @Param username path string true "Username пользователя"
 // @Security JwtAuth
 // @Success 200 {object} view.UserView "Данные пользователя"
 // @Failure 400 "Некорректный запрос"
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Пользователь не найден"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/email/{email} [get]
-func (h *userHandlers) GetByEmailHandler(c *gin.Context) {
+// @Router /users/{username} [get]
+func (h *userHandlers) GetByUsernameHandler(c *gin.Context) {
 	ctx := context.Background()
 
-	email := c.Param("email")
-	user, err := h.interactor.GetByEmail(ctx, email)
+	username := c.Param("username")
+	user, err := h.interactor.GetByUsername(ctx, username)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
 		return
@@ -233,7 +233,7 @@ func (h *userHandlers) GetByEmailHandler(c *gin.Context) {
 // @Failure 404 "Пользователь не найден"
 // @Failure 422 "Ошибка при обработке данных"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/id/{id} [put]
+// @Router /users/{id} [put]
 func (h *userHandlers) UpdateHandler(c *gin.Context) {
 	ctx := context.Background()
 
@@ -278,7 +278,7 @@ func (h *userHandlers) UpdateHandler(c *gin.Context) {
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Пользователь не найден"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/id/{id} [delete]
+// @Router /users/{id} [delete]
 func (h *userHandlers) DeleteHandler(c *gin.Context) {
 	ctx := context.Background()
 

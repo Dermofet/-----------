@@ -3,10 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
-	"go-test-grpc-http/cmd/go-test-grpc-http/config"
-	"go-test-grpc-http/internal/api/grpc"
-	"go-test-grpc-http/internal/api/http"
-	"sync"
+	"music-backend-test/cmd/music-backend-test/config"
+	"music-backend-test/internal/api/http"
 
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -55,60 +53,26 @@ func (a *app) Start(ctx context.Context) {
 		logger.Error("db migration error", zap.Error(err))
 	}
 
-	wg := &sync.WaitGroup{}
-	// Старт HTTP-сервера
-	wg.Add(1)
-	go func() {
-		defer func() {
-			if e := recover(); e != nil {
-				logger.Panic("http start panic", zap.Error(fmt.Errorf("%s", e)))
-			}
-			wg.Done()
-		}()
-		addr := fmt.Sprintf("%s:%d", a.config.HttpServer.Host, a.config.HttpServer.Port)
-		a.httpServer = http.NewServer(addr, a.dbConn, logger)
-		if a.httpServer == nil {
-			cancelApp()
-			logger.Fatal("can't create http server")
-			return
-		}
-		err := a.httpServer.Run(appCtx)
-		// Отменяем контекст, если HTTP-сервер завершил работу
-		cancelApp()
-		if err != nil {
-			logger.Error("can't start http server", zap.Error(err))
-			return
+	defer func() {
+		if e := recover(); e != nil {
+			logger.Panic("http start panic", zap.Error(fmt.Errorf("%s", e)))
 		}
 	}()
 
-	// Старт GRPC-сервера
-	wg.Add(1)
-	go func() {
-		defer func() {
-			if e := recover(); e != nil {
-				logger.Panic("grpc start panic", zap.Error(fmt.Errorf("%s", e)))
-			}
-			wg.Done()
-		}()
-
-		addr := fmt.Sprintf("%s:%d", a.config.GrpcServer.Host, a.config.GrpcServer.Port)
-		grpcServer := grpc.NewServer(addr, dbConn, logger)
-		if grpcServer == nil {
-			cancelApp()
-			logger.Fatal("can't create grpc server")
-			return
-		}
-
-		err := grpcServer.Run(ctx)
-		// Отменяем контекст, если GRPC-сервер завершил работу
+	addr := fmt.Sprintf("%s:%d", a.config.HttpServer.Host, a.config.HttpServer.Port)
+	a.httpServer = http.NewServer(addr, a.dbConn, logger)
+	if a.httpServer == nil {
 		cancelApp()
-		if err != nil {
-			if err != nil {
-				logger.Error("can't start grpc server", zap.Error(err))
-				return
-			}
-		}
-	}()
+		logger.Fatal("can't create http server")
+		return
+	}
+	err = a.httpServer.Run(appCtx)
+	// Отменяем контекст, если HTTP-сервер завершил работу
+	cancelApp()
+	if err != nil {
+		logger.Error("can't start http server", zap.Error(err))
+		return
+	}
 }
 
 // GracefulShutdown graceful shutdown приложения

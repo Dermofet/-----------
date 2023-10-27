@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-test-grpc-http/cmd/go-test-grpc-http/config"
-	"go-test-grpc-http/internal/app"
 	"log"
+	"music-backend-test/cmd/music-backend-test/config"
+	"music-backend-test/internal/app"
 	"sync"
-
-	_ "go-test-grpc-http/docs"
 
 	_ "github.com/lib/pq"
 	_ "github.com/swaggo/http-swagger"
@@ -43,10 +41,9 @@ var AppVersion *appVersion
 // @title Golang Test API
 // @description API for Golang Test Project
 // @termsOfService http://swagger.io/terms/
-// @contact.name Invar Poyda
+// @contact.name Dermofet3_3
 // @version 0.0.1
-// @host localhost:8001
-// @basePath /api/v0.0.1
+// @host localhost:8000
 // @schemes http
 
 // @securitydefinitions.apikey JwtAuth

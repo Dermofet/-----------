@@ -4,7 +4,7 @@ services:
     image: postgres:15
     restart: on-failure
     volumes:
-        - ./pgdata:/var/lib/postgresql/data
+        - pgdata:/var/lib/postgresql/data
     ports:
         - "${DB_PORT}:5432"
     environment:
@@ -16,3 +16,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  pgdata:

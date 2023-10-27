@@ -9,7 +9,7 @@ type UserHandlers interface {
 	UpdateMeHandler(c *gin.Context)
 	DeleteMeHandler(c *gin.Context)
 	GetByIdHandler(c *gin.Context)
-	GetByEmailHandler(c *gin.Context)
+	GetByUsernameHandler(c *gin.Context)
 	UpdateHandler(c *gin.Context)
 	DeleteHandler(c *gin.Context)
 }

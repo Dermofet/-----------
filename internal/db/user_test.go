@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"go-test-grpc-http/internal/entity"
+	"music-backend-test/internal/entity"
 	"reflect"
 	"testing"
 
@@ -12,6 +12,109 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
+
+func Test_source_CreateUser(t *testing.T) {
+	type fields struct {
+		db sqlmock.Sqlmock
+	}
+	type args struct {
+		ctx  context.Context
+		user *entity.UserCreate
+	}
+	tests := []struct {
+		name    string
+		args    args
+		setup   func(a args, f fields)
+		wantErr bool
+	}{
+		{
+			name: "success: CreateUser source: user created",
+			args: args{
+				ctx: context.Background(),
+				user: &entity.UserCreate{
+					Username: "John",
+					Password: "qwerty1234",
+				},
+			},
+			setup: func(a args, f fields) {
+				rows := sqlmock.
+					NewRows([]string{
+						"id",
+						"username",
+						"password",
+					}).
+					AddRow(
+						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+						"John",
+						"qwerty1234",
+					)
+				f.db.ExpectQuery("INSERT INTO users (id, username, password) VALUES ($1, $2, $3)").
+					WillReturnRows(rows)
+			},
+			wantErr: false,
+		},
+		{
+			name: "error: CreateUser source: can't exec query",
+			args: args{
+				ctx: context.Background(),
+				user: &entity.UserCreate{
+					Username: "John",
+					Password: "qwerty1234",
+				},
+			},
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("ABRA-CADABRA").
+					WillReturnError(fmt.Errorf("can't exec query"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "error: CreateUser source: can't scan user",
+			args: args{
+				ctx: context.Background(),
+				user: &entity.UserCreate{
+					Username: "John",
+					Password: "qwerty1234",
+				},
+			},
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("INSERT INTO users (id, username, password) VALUES ($1, $2, $3)").
+					WillReturnError(fmt.Errorf("can't scan user"))
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Errorf("can't connect to database: %v", err)
+				return
+			}
+			f := fields{
+				db: mock,
+			}
+
+			s := &source{
+				db: sqlx.NewDb(db, "sqlmock"),
+			}
+
+			tt.setup(tt.args, f)
+
+			got, err := s.CreateUser(tt.args.ctx, tt.args.user)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("source.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil {
+				_, err = uuid.Parse(got.String())
+				if err != nil {
+					t.Errorf("source.CreateUser() = %v, want uuid", got)
+				}
+			}
+		})
+	}
+}
 
 func Test_source_GetUserById(t *testing.T) {
 	type fields struct {
@@ -37,35 +140,20 @@ func Test_source_GetUserById(t *testing.T) {
 				},
 			},
 			want: &entity.UserDB{
-				ID:         uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				FirstName:  "John",
-				LastName:   "Doe",
-				SecondName: "DoeD",
-				Age:        30,
-				Email:      "doe@example.com",
-				Phone:      "+1111111111",
-				Password:   "qwerty1234",
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				Username: "John",
+				Password: "qwerty1234",
 			},
 			setup: func(a args, f fields) {
 				rows := sqlmock.
 					NewRows([]string{
 						"id",
-						"first_name",
-						"last_name",
-						"second_name",
-						"age",
-						"email",
-						"phone",
+						"username",
 						"password",
 					}).
 					AddRow(
 						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 						"John",
-						"Doe",
-						"DoeD",
-						30,
-						"doe@example.com",
-						"+1111111111",
 						"qwerty1234",
 					)
 				f.db.ExpectQuery("SELECT * FROM users WHERE id = $1").WithArgs(a.id.String()).WillReturnRows(rows)
@@ -144,98 +232,81 @@ func Test_source_GetUserById(t *testing.T) {
 	}
 }
 
-func Test_source_CreateUser(t *testing.T) {
+func Test_source_GetUserByUsername(t *testing.T) {
 	type fields struct {
 		db sqlmock.Sqlmock
 	}
 	type args struct {
-		ctx  context.Context
-		user *entity.UserCreate
+		ctx      context.Context
+		username string
 	}
 	tests := []struct {
 		name    string
 		args    args
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
 		{
-			name: "success: CreateUser source: user created",
+			name: "success: GetUserByUsername source: user found",
 			args: args{
-				ctx: context.Background(),
-				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        30,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
-				},
+				ctx:      context.Background(),
+				username: "John",
+			},
+			want: &entity.UserDB{
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				Username: "John",
+				Password: "qwerty1234",
 			},
 			setup: func(a args, f fields) {
 				rows := sqlmock.
 					NewRows([]string{
 						"id",
-						"first_name",
-						"last_name",
-						"second_name",
-						"age",
-						"email",
-						"phone",
+						"username",
 						"password",
 					}).
 					AddRow(
 						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 						"John",
-						"Doe",
-						"DoeD",
-						30,
-						"doe@example.com",
-						"+1111111111",
 						"qwerty1234",
 					)
-				f.db.ExpectQuery("INSERT INTO users (id, first_name, last_name, second_name, age, email, phone, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)").
-					WillReturnRows(rows)
+				f.db.ExpectQuery("SELECT * FROM users WHERE username = $1").WithArgs(a.username).WillReturnRows(rows)
 			},
 			wantErr: false,
 		},
 		{
-			name: "error: CreateUser source: can't exec query",
+			name: "success: GetUserByUsername source: can't find user",
 			args: args{
-				ctx: context.Background(),
-				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        30,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
-				},
+				ctx:      context.Background(),
+				username: "John",
 			},
+			want: nil,
 			setup: func(a args, f fields) {
-				f.db.ExpectQuery("ABRA-CADABRA").
-					WillReturnError(fmt.Errorf("can't exec query"))
+				f.db.ExpectQuery("SELECT * FROM users WHERE username = $1").WithArgs(a.username).WillReturnError(sql.ErrNoRows)
 			},
 			wantErr: true,
 		},
 		{
-			name: "error: CreateUser source: can't scan user",
+			name: "error: GetUserByUsername source: can't exec query",
 			args: args{
-				ctx: context.Background(),
-				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        30,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
-				},
+				ctx:      context.Background(),
+				username: "John",
 			},
+			want: nil,
 			setup: func(a args, f fields) {
-				f.db.ExpectQuery("INSERT INTO users (id, first_name, last_name, second_name, age, email, phone, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)").
-					WillReturnError(fmt.Errorf("can't scan user"))
+				f.db.ExpectQuery("ABRA-CADABRA").WithArgs(a.username).WillReturnError(fmt.Errorf("can't exec query"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "error: GetUserByUsername source: can't scan user",
+			args: args{
+				ctx:      context.Background(),
+				username: "John",
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("SELECT * FROM users WHERE username = $1").WithArgs(a.username).WillReturnError(fmt.Errorf("can't scan user"))
 			},
 			wantErr: true,
 		},
@@ -257,16 +328,13 @@ func Test_source_CreateUser(t *testing.T) {
 
 			tt.setup(tt.args, f)
 
-			got, err := s.CreateUser(tt.args.ctx, tt.args.user)
+			got, err := s.GetUserByUsername(tt.args.ctx, tt.args.username)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("source.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("source.GetUserByUsername() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != nil {
-				_, err = uuid.Parse(got.String())
-				if err != nil {
-					t.Errorf("source.CreateUser() = %v, want uuid", got)
-				}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("source.GetUserByUsername() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -296,49 +364,29 @@ func Test_source_UpdateUser(t *testing.T) {
 					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				},
 				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        31,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
+					Username: "John",
+					Password: "qwerty1234",
 				},
 			},
 			want: &entity.UserDB{
-				ID:         uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				FirstName:  "John",
-				LastName:   "Doe",
-				SecondName: "DoeD",
-				Age:        31,
-				Email:      "doe@example.com",
-				Phone:      "+1111111111",
-				Password:   "qwerty1234",
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				Username: "John",
+				Password: "qwerty1234",
 			},
 			setup: func(a args, f fields) {
 				rows := sqlmock.
 					NewRows([]string{
 						"id",
-						"first_name",
-						"last_name",
-						"second_name",
-						"age",
-						"email",
-						"phone",
+						"username",
 						"password",
 					}).
 					AddRow(
 						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 						"John",
-						"Doe",
-						"DoeD",
-						31,
-						"doe@example.com",
-						"+1111111111",
 						"qwerty1234",
 					)
-				f.db.ExpectQuery("UPDATE users SET first_name = $1, last_name = $2, second_name = $3, age = $4, email = $5, phone = $6, password = $7 WHERE id = $8").
-					WithArgs("John", "Doe", "DoeD", 31, "doe@example.com", "+1111111111", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
+				f.db.ExpectQuery("UPDATE users SET username = $1, password = $2 WHERE id = $3").
+					WithArgs("John", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
 					WillReturnRows(rows)
 			},
 			wantErr: false,
@@ -351,19 +399,14 @@ func Test_source_UpdateUser(t *testing.T) {
 					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				},
 				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        30,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
+					Username: "John",
+					Password: "qwerty1234",
 				},
 			},
 			want: nil,
 			setup: func(a args, f fields) {
 				f.db.ExpectQuery("ABRA-CADABRA").
-					WithArgs("John", "Doe", "DoeD", 31, "doe@example.com", "+1111111111", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
+					WithArgs("John", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
 					WillReturnError(fmt.Errorf("can't exec query"))
 			},
 			wantErr: true,
@@ -376,19 +419,14 @@ func Test_source_UpdateUser(t *testing.T) {
 					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				},
 				user: &entity.UserCreate{
-					FirstName:  "John",
-					LastName:   "Doe",
-					SecondName: "DoeD",
-					Age:        30,
-					Email:      "doe@example.com",
-					Phone:      "+1111111111",
-					Password:   "qwerty1234",
+					Username: "John",
+					Password: "qwerty1234",
 				},
 			},
 			want: nil,
 			setup: func(a args, f fields) {
-				f.db.ExpectQuery("UPDATE users SET first_name = $1, last_name = $2, second_name = $3, age = $4, email = $5, phone = $6, password = $7 WHERE id = $8").
-					WithArgs("John", "Doe", "DoeD", 31, "doe@example.com", "+1111111111", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
+				f.db.ExpectQuery("UPDATE users SET username = $1, password = $2 WHERE id = $3").
+					WithArgs("John", "qwerty1234", uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
 					WillReturnError(fmt.Errorf("can't scan user"))
 			},
 			wantErr: true,
@@ -448,9 +486,21 @@ func Test_source_DeleteUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(a args, f fields) {
+				rows := sqlmock.
+					NewRows([]string{
+						"id",
+						"username",
+						"password",
+					}).
+					AddRow(
+						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+						"John",
+						"qwerty1234",
+					)
+
 				f.db.ExpectQuery("DELETE FROM users WHERE id = $1").
 					WithArgs(uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
-					WillReturnRows(sqlmock.NewRows([]string{}))
+					WillReturnRows(rows)
 			},
 			wantErr: false,
 		},
@@ -465,25 +515,8 @@ func Test_source_DeleteUser(t *testing.T) {
 			want: nil,
 			setup: func(a args, f fields) {
 				f.db.ExpectQuery("ABRA-CADABRA").
-					WithArgs(
-						uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
-					WillReturnError(fmt.Errorf("can't exec query"))
-			},
-			wantErr: true,
-		},
-		{
-			name: "error: UpDEleteUser source: can't scan user",
-			args: args{
-				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
-			},
-			want: nil,
-			setup: func(a args, f fields) {
-				f.db.ExpectQuery("DELETE FROM users WHERE id = ?").
 					WithArgs(uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522")).
-					WillReturnError(fmt.Errorf("can't scan user"))
+					WillReturnError(fmt.Errorf("can't exec query"))
 			},
 			wantErr: true,
 		},

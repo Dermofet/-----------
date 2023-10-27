@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go-test-grpc-http/internal/api/http/presenter"
-	_ "go-test-grpc-http/internal/api/http/view"
-	"go-test-grpc-http/internal/entity"
-	"go-test-grpc-http/internal/usecase"
+	"music-backend-test/internal/api/http/presenter"
+	_ "music-backend-test/internal/api/http/view"
+	"music-backend-test/internal/entity"
+	"music-backend-test/internal/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -46,25 +46,25 @@ func (a *authHandlers) SignUp(c *gin.Context) {
 		return
 	}
 
-	var user *entity.UserCreate
-	err = json.Unmarshal(data, &user)
+	var new_user *entity.UserCreate
+	err = json.Unmarshal(data, &new_user)
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't sign up user: %v", err))
 		return
 	}
 
-	userId, err := a.interactor.GetIdByEmail(ctx, user.Email)
+	user, err := a.interactor.GetByUsername(ctx, new_user.Username)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user from db: %v", err))
 		return
 	}
 
-	if userId != nil {
+	if user != nil {
 		c.AbortWithStatus(http.StatusConflict)
 		return
 	}
 
-	userId, err = a.interactor.Create(ctx, user)
+	userId, err := a.interactor.Create(ctx, new_user)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't sign up user: %v", err))
 		return
@@ -81,11 +81,11 @@ func (a *authHandlers) SignUp(c *gin.Context) {
 
 // SignIn godoc
 // @Summary Вход пользователя
-// @Description Авторизация пользователя с использованием email и пароля.
+// @Description Авторизация пользователя с использованием имени пользователя и пароля.
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param request body entity.UserSignIn true "Данные пользователя для входа"
+// @Param request body entity.UserCreate true "Данные пользователя для входа"
 // @Success 200 {object} view.TokenView "Токен авторизации"
 // @Failure 400 "Некорректный запрос"
 // @Failure 401 "Ошибка авторизации"
@@ -101,25 +101,25 @@ func (a *authHandlers) SignIn(c *gin.Context) {
 		return
 	}
 
-	var user *entity.UserSignIn
-	err = json.Unmarshal(data, &user)
+	var signinUser *entity.UserCreate
+	err = json.Unmarshal(data, &signinUser)
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't sign up user: %v", err))
 		return
 	}
 
-	userID, err := a.interactor.GetIdByEmail(ctx, user.Email)
+	user, err := a.interactor.GetByUsername(ctx, signinUser.Username)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user from interactor: %v", err))
 		return
 	}
 
-	if userID == nil {
+	if user == nil {
 		c.AbortWithStatus(http.StatusConflict)
 		return
 	}
 
-	token, err := a.presenter.ToTokenView(entity.GenerateToken(userID))
+	token, err := a.presenter.ToTokenView(entity.GenerateToken(user.ID))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't sign in user: %v", err))
 		return

@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"go-test-grpc-http/internal/entity"
-	"go-test-grpc-http/internal/repository"
+	"music-backend-test/internal/entity"
+	"music-backend-test/internal/repository"
 )
 
 type userInteractor struct {
@@ -36,22 +36,13 @@ func (u *userInteractor) GetById(ctx context.Context, id *entity.UserID) (*entit
 	return user, nil
 }
 
-func (u *userInteractor) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
-	user, err := u.repo.GetByEmail(ctx, email)
+func (u *userInteractor) GetByUsername(ctx context.Context, email string) (*entity.User, error) {
+	user, err := u.repo.GetByUsername(ctx, email)
 	if err != nil {
 		return nil, fmt.Errorf("can't get user by email from repository %w", err)
 	}
 
 	return user, nil
-}
-
-func (u *userInteractor) GetIdByEmail(ctx context.Context, email string) (*entity.UserID, error) {
-	id, err := u.repo.GetIdByEmail(ctx, email)
-	if err != nil {
-		return nil, fmt.Errorf("can't get user id by email from repository %w", err)
-	}
-
-	return id, nil
 }
 
 func (u *userInteractor) Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error) {

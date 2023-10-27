@@ -12,7 +12,7 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "Invar Poyda"
+            "name": "Dermofet3_3"
         },
         "version": "{{.Version}}"
     },
@@ -21,7 +21,7 @@ const docTemplate = `{
     "paths": {
         "/auth/signin": {
             "post": {
-                "description": "Авторизация пользователя с использованием email и пароля.",
+                "description": "Авторизация пользователя с использованием имени пользователя и пароля.",
                 "consumes": [
                     "application/json"
                 ],
@@ -39,7 +39,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.UserSignIn"
+                            "$ref": "#/definitions/entity.UserCreate"
                         }
                     }
                 ],
@@ -108,33 +108,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/email/{email}": {
+        "/users/me": {
             "get": {
                 "security": [
                     {
                         "JwtAuth": []
                     }
                 ],
-                "description": "Получение информации о пользователе по его уникальному идентификатору.",
+                "description": "Получение пользователя по его уникальному идентификатору из JWT токена",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "tags": [
                     "Users"
                 ],
-                "summary": "Получение пользователя по Email",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Email пользователя",
-                        "name": "email",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Получение пользователя по JWT токену",
                 "responses": {
                     "200": {
                         "description": "Данные пользователя",
@@ -155,9 +146,96 @@ const docTemplate = `{
                         "description": "Внутренняя ошибка сервера"
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JwtAuth": []
+                    }
+                ],
+                "description": "Обновление информации о пользователе по его уникальному идентификатору из JWT токена",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Обновление пользователя по JWT токену",
+                "parameters": [
+                    {
+                        "description": "Данные пользователя для обновления",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Обновленные данные пользователя",
+                        "schema": {
+                            "$ref": "#/definitions/view.UserView"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный запрос"
+                    },
+                    "401": {
+                        "description": "Неавторизованный запрос"
+                    },
+                    "404": {
+                        "description": "Пользователь не найден"
+                    },
+                    "422": {
+                        "description": "Ошибка при обработке данных"
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JwtAuth": []
+                    }
+                ],
+                "description": "Удаление пользователя по его уникальному идентификатору из JWT токена.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Удаление пользователя по JWT токену",
+                "responses": {
+                    "204": {
+                        "description": "Пользователь успешно удален"
+                    },
+                    "400": {
+                        "description": "Некорректный запрос"
+                    },
+                    "401": {
+                        "description": "Неавторизованный запрос"
+                    },
+                    "404": {
+                        "description": "Пользователь не найден"
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера"
+                    }
+                }
             }
         },
-        "/users/id/{id}": {
+        "/users/{id}": {
             "get": {
                 "security": [
                     {
@@ -309,117 +387,39 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/me": {
+        "/users/{username}": {
             "get": {
                 "security": [
                     {
                         "JwtAuth": []
                     }
                 ],
-                "description": "Получение пользователя по его уникальному идентификатору из JWT токена",
+                "description": "Получение информации о пользователе по его уникальному идентификатору.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Users"
                 ],
-                "summary": "Получение пользователя по JWT токену",
+                "summary": "Получение пользователя по Username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username пользователя",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Данные пользователя",
                         "schema": {
                             "$ref": "#/definitions/view.UserView"
                         }
-                    },
-                    "400": {
-                        "description": "Некорректный запрос"
-                    },
-                    "401": {
-                        "description": "Неавторизованный запрос"
-                    },
-                    "404": {
-                        "description": "Пользователь не найден"
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "JwtAuth": []
-                    }
-                ],
-                "description": "Обновление информации о пользователе по его уникальному идентификатору из JWT токена",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Обновление пользователя по JWT токену",
-                "parameters": [
-                    {
-                        "description": "Данные пользователя для обновления",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.UserCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Обновленные данные пользователя",
-                        "schema": {
-                            "$ref": "#/definitions/view.UserView"
-                        }
-                    },
-                    "400": {
-                        "description": "Некорректный запрос"
-                    },
-                    "401": {
-                        "description": "Неавторизованный запрос"
-                    },
-                    "404": {
-                        "description": "Пользователь не найден"
-                    },
-                    "422": {
-                        "description": "Ошибка при обработке данных"
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "JwtAuth": []
-                    }
-                ],
-                "description": "Удаление пользователя по его уникальному идентификатору из JWT токена.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Удаление пользователя по JWT токену",
-                "responses": {
-                    "204": {
-                        "description": "Пользователь успешно удален"
                     },
                     "400": {
                         "description": "Некорректный запрос"
@@ -441,45 +441,12 @@ const docTemplate = `{
         "entity.UserCreate": {
             "type": "object",
             "properties": {
-                "age": {
-                    "description": "Возраст",
-                    "type": "integer"
-                },
-                "email": {
-                    "description": "Электронная почта",
-                    "type": "string"
-                },
-                "firstName": {
-                    "description": "Имя",
-                    "type": "string"
-                },
-                "lastName": {
-                    "description": "Фамилия",
-                    "type": "string"
-                },
                 "password": {
                     "description": "Пароль",
                     "type": "string"
                 },
-                "phone": {
-                    "description": "Номер телефона",
-                    "type": "string"
-                },
-                "secondName": {
-                    "description": "Отчество",
-                    "type": "string"
-                }
-            }
-        },
-        "entity.UserSignIn": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "description": "Электронная почта",
-                    "type": "string"
-                },
-                "password": {
-                    "description": "Пароль",
+                "username": {
+                    "description": "Имя пользователя",
                     "type": "string"
                 }
             }
@@ -496,24 +463,12 @@ const docTemplate = `{
         "view.UserView": {
             "type": "object",
             "properties": {
-                "age": {
-                    "description": "Возраст",
-                    "type": "integer"
-                },
-                "email": {
-                    "description": "Электронная почта",
-                    "type": "string"
-                },
                 "id": {
                     "description": "ID",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Имя в формате ФИО",
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "Номер мобильного телефона",
+                    "description": "Имя пользователя",
                     "type": "string"
                 }
             }
@@ -532,8 +487,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.0.1",
-	Host:             "localhost:8001",
-	BasePath:         "/api/v0.0.1",
+	Host:             "localhost:8000",
+	BasePath:         "",
 	Schemes:          []string{"http"},
 	Title:            "Golang Test API",
 	Description:      "API for Golang Test Project",

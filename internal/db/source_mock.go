@@ -6,7 +6,7 @@ package db
 
 import (
 	context "context"
-	entity "go-test-grpc-http/internal/entity"
+	entity "music-backend-test/internal/entity"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -64,21 +64,6 @@ func (mr *MockUserSourceMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUserSource)(nil).DeleteUser), ctx, id)
 }
 
-// GetUserByEmail mocks base method.
-func (m *MockUserSource) GetUserByEmail(ctx context.Context, email string) (*entity.UserDB, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserByEmail", ctx, email)
-	ret0, _ := ret[0].(*entity.UserDB)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserByEmail indicates an expected call of GetUserByEmail.
-func (mr *MockUserSourceMockRecorder) GetUserByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockUserSource)(nil).GetUserByEmail), ctx, email)
-}
-
 // GetUserById mocks base method.
 func (m *MockUserSource) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
@@ -94,19 +79,19 @@ func (mr *MockUserSourceMockRecorder) GetUserById(ctx, id interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockUserSource)(nil).GetUserById), ctx, id)
 }
 
-// GetUserIdByEmail mocks base method.
-func (m *MockUserSource) GetUserIdByEmail(ctx context.Context, email string) (*entity.UserID, error) {
+// GetUserByUsername mocks base method.
+func (m *MockUserSource) GetUserByUsername(ctx context.Context, email string) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserIdByEmail", ctx, email)
-	ret0, _ := ret[0].(*entity.UserID)
+	ret := m.ctrl.Call(m, "GetUserByUsername", ctx, email)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserIdByEmail indicates an expected call of GetUserIdByEmail.
-func (mr *MockUserSourceMockRecorder) GetUserIdByEmail(ctx, email interface{}) *gomock.Call {
+// GetUserByUsername indicates an expected call of GetUserByUsername.
+func (mr *MockUserSourceMockRecorder) GetUserByUsername(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserIdByEmail", reflect.TypeOf((*MockUserSource)(nil).GetUserIdByEmail), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUsername", reflect.TypeOf((*MockUserSource)(nil).GetUserByUsername), ctx, email)
 }
 
 // UpdateUser mocks base method.

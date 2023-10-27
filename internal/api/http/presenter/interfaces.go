@@ -1,8 +1,8 @@
 package presenter
 
 import (
-	"go-test-grpc-http/internal/api/http/view"
-	"go-test-grpc-http/internal/entity"
+	"music-backend-test/internal/api/http/view"
+	"music-backend-test/internal/entity"
 )
 
 //go:generate mockgen -source=./interfaces.go -destination=./presenter_mock.go -package=presenter

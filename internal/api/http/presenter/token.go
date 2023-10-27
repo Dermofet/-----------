@@ -2,8 +2,8 @@ package presenter
 
 import (
 	"fmt"
-	"go-test-grpc-http/internal/api/http/view"
-	"go-test-grpc-http/internal/entity"
+	"music-backend-test/internal/api/http/view"
+	"music-backend-test/internal/entity"
 )
 
 type tokenPresenter struct {

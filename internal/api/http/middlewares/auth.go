@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"fmt"
-	"go-test-grpc-http/cmd/go-test-grpc-http/config"
-	"go-test-grpc-http/internal/entity"
+	"music-backend-test/cmd/music-backend-test/config"
+	"music-backend-test/internal/entity"
 	"net/http"
 	"strings"
 
