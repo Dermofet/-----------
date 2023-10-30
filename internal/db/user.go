@@ -7,15 +7,26 @@ import (
 	"music-backend-test/internal/entity"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
-func (s *source) CreateUser(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+type UserSourсe struct {
+	db *sqlx.DB
+}
+
+func NewUserSourсe(source *source) *UserSourсe {
+	return &UserSourсe{
+		db: source.db,
+	}
+}
+
+func (u *UserSourсe) CreateUser(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
 	newUuid := uuid.New()
 
-	row := s.db.QueryRowxContext(dbCtx, "INSERT INTO users (id, username, password) VALUES ($1, $2, $3)",
+	row := u.db.QueryRowxContext(dbCtx, "INSERT INTO users (id, username, password) VALUES ($1, $2, $3)",
 		newUuid, user.Username, user.Password)
 	if row.Err() != nil {
 		return nil, fmt.Errorf("can't exec query: %w", row.Err())
@@ -26,11 +37,11 @@ func (s *source) CreateUser(ctx context.Context, user *entity.UserCreate) (*enti
 	}, nil
 }
 
-func (s *source) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
+func (u *UserSourсe) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := s.db.QueryRowxContext(dbCtx, "SELECT * FROM users WHERE id = $1", id.String())
+	row := u.db.QueryRowxContext(dbCtx, "SELECT * FROM users WHERE id = $1", id.String())
 	if row.Err() != nil {
 		return nil, fmt.Errorf("can't exec query: %w", row.Err())
 	}
@@ -46,11 +57,11 @@ func (s *source) GetUserById(ctx context.Context, id *entity.UserID) (*entity.Us
 	return &userDB, nil
 }
 
-func (s *source) GetUserByUsername(ctx context.Context, username string) (*entity.UserDB, error) {
+func (u *UserSourсe) GetUserByUsername(ctx context.Context, username string) (*entity.UserDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := s.db.QueryRowxContext(dbCtx, "SELECT * FROM users WHERE username = $1", username)
+	row := u.db.QueryRowxContext(dbCtx, "SELECT * FROM users WHERE username = $1", username)
 	if row.Err() != nil {
 		return nil, fmt.Errorf("can't exec query: %w", row.Err())
 	}
@@ -66,11 +77,11 @@ func (s *source) GetUserByUsername(ctx context.Context, username string) (*entit
 	return &userDB, nil
 }
 
-func (s *source) UpdateUser(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.UserDB, error) {
+func (u *UserSourсe) UpdateUser(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.UserDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := s.db.QueryRowxContext(dbCtx, "UPDATE users SET username = $1, password = $2 WHERE id = $3",
+	row := u.db.QueryRowxContext(dbCtx, "UPDATE users SET username = $1, password = $2 WHERE id = $3",
 		user.Username, user.Password, id.String())
 	if row.Err() != nil {
 		return nil, fmt.Errorf("can't exec query: %w", row.Err())
@@ -83,11 +94,11 @@ func (s *source) UpdateUser(ctx context.Context, id *entity.UserID, user *entity
 	}, nil
 }
 
-func (s *source) DeleteUser(ctx context.Context, id *entity.UserID) error {
+func (u *UserSourсe) DeleteUser(ctx context.Context, id *entity.UserID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := s.db.QueryRowxContext(dbCtx, "DELETE FROM users WHERE id = $1", id.String())
+	row := u.db.QueryRowxContext(dbCtx, "DELETE FROM users WHERE id = $1", id.String())
 	if row.Err() != nil {
 		return fmt.Errorf("can't exec query: %w", row.Err())
 	}
