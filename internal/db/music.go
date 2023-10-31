@@ -27,11 +27,13 @@ func (m *musicSource) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	for i := 0; rows.Next(); i++ {
 		var scanEntity entity.MusicShow
 		rows.Scan(&scanEntity.Name)
 		data = append(data, scanEntity)
 	}
+
 	return data, nil
 }
 
@@ -44,25 +46,30 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }
 
 func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
+
 	row := m.db.QueryRowxContext(dbCtx, "Update music set name = $1 where id=$2", musicUpdate.Name, musicUpdate.Id.String())
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }
 
 func (m *musicSource) Delete(ctx context.Context, id *entity.MusicID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
+
 	row := m.db.QueryRowxContext(dbCtx, "Delete from music where id = $1", id.String())
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }

@@ -16,34 +16,38 @@ func NewMusicInteractor(repo repository.MusicRepository) *musicInteractor {
 	}
 }
 
-func (m musicInteractor) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
+func (m *musicInteractor) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
 	music, err := m.repo.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return music, err
+
+	return music, nil
 }
 
-func (m musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
+func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
 	err := m.repo.Create(ctx, musicCreate)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (m musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
+func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	err := m.repo.Update(ctx, musicUpdate)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (m musicInteractor) Delete(ctx context.Context, id *entity.MusicID) error {
+func (m *musicInteractor) Delete(ctx context.Context, id *entity.MusicID) error {
 	err := m.repo.Delete(ctx, id)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

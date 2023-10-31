@@ -98,10 +98,6 @@ func (u *UserSourсe) DeleteUser(ctx context.Context, id *entity.UserID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	// row := u.db.QueryRowxContext(dbCtx, "DELETE FROM user_music WHERE user_id = $1", id.String())
-	// if row.Err() != nil {
-	// 	return fmt.Errorf("can't exec query: %w", row.Err())
-	// }
 	row := u.db.QueryRowxContext(dbCtx, "DELETE FROM users WHERE id = $1", id.String())
 	if row.Err() != nil {
 		return fmt.Errorf("can't exec query: %w", row.Err())

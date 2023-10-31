@@ -21,6 +21,7 @@ func (m *musicRepository) GetAll(ctx context.Context) ([]entity.MusicShow, error
 	if err != nil {
 		return nil, err
 	}
+
 	return music, nil
 }
 
@@ -29,6 +30,7 @@ func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicC
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -37,6 +39,7 @@ func (m *musicRepository) Update(ctx context.Context, musicUpdate *entity.MusicD
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -45,5 +48,6 @@ func (m *musicRepository) Delete(ctx context.Context, id *entity.MusicID) error 
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
