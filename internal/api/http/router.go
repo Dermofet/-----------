@@ -23,8 +23,9 @@ import (
 )
 
 type routerHandlers struct {
-	userHandlers handlers.UserHandlers
-	authHandlers handlers.AuthHandlers
+	userHandlers  handlers.UserHandlers
+	authHandlers  handlers.AuthHandlers
+	musicHandlers handlers.MusicHandlers
 }
 
 type router struct {
@@ -94,8 +95,12 @@ func (r *router) registerRoutes() error {
 	))
 
 	pgSource := db.NewSource(r.db)
-	userRepository := repository.NewUserRepository(pgSource)
+	userSource := db.NewUserSourсe(pgSource)
+	musicSource := db.NewMusicSource(pgSource)
+	userRepository := repository.NewUserRepository(userSource)
+	musicRepository := repository.NewMusicRepositiry(musicSource)
 	userInteractor := usecase.NewUserInteractor(userRepository)
+	musicInteractor := usecase.NewMusicInteractor(musicRepository)
 	userPresenter := presenter.NewUserPresenter()
 	tokenPresenter := presenter.NewTokenPresenter()
 	r.handlers.authHandlers = handlers.NewAuthHandlers(userInteractor, tokenPresenter)
@@ -117,6 +122,17 @@ func (r *router) registerRoutes() error {
 		forAllUserGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
 		forAllUserGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
 		forAllUserGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
+	}
+
+	musicGroup := basePath.Group("/music")
+	{
+		// musicGroup.Use(middlewares.NewAuthMiddleware())
+		r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor)
+		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
+		//Admin Middleware
+		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
+		musicGroup.PATCH("/update", r.handlers.musicHandlers.Update)
+		musicGroup.DELETE("/delete", r.handlers.musicHandlers.Delete)
 	}
 
 	return nil

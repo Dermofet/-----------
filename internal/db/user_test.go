@@ -99,9 +99,13 @@ func Test_source_CreateUser(t *testing.T) {
 				db: sqlx.NewDb(db, "sqlmock"),
 			}
 
+			usersSource := &UserSourсe{
+				db: s.db,
+			}
+
 			tt.setup(tt.args, f)
 
-			got, err := s.CreateUser(tt.args.ctx, tt.args.user)
+			got, err := usersSource.CreateUser(tt.args.ctx, tt.args.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("source.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -218,9 +222,13 @@ func Test_source_GetUserById(t *testing.T) {
 				db: sqlx.NewDb(db, "sqlmock"),
 			}
 
+			usersSource := &UserSourсe{
+				db: s.db,
+			}
+
 			tt.setup(tt.args, f)
 
-			got, err := s.GetUserById(tt.args.ctx, tt.args.id)
+			got, err := usersSource.GetUserById(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("source.GetUserById() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -326,9 +334,13 @@ func Test_source_GetUserByUsername(t *testing.T) {
 				db: sqlx.NewDb(db, "sqlmock"),
 			}
 
+			usersSource := &UserSourсe{
+				db: s.db,
+			}
+
 			tt.setup(tt.args, f)
 
-			got, err := s.GetUserByUsername(tt.args.ctx, tt.args.username)
+			got, err := usersSource.GetUserByUsername(tt.args.ctx, tt.args.username)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("source.GetUserByUsername() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -447,9 +459,13 @@ func Test_source_UpdateUser(t *testing.T) {
 				db: sqlx.NewDb(db, "sqlmock"),
 			}
 
+			usersSource := &UserSourсe{
+				db: s.db,
+			}
+
 			tt.setup(tt.args, f)
 
-			got, err := s.UpdateUser(tt.args.ctx, tt.args.id, tt.args.user)
+			got, err := usersSource.UpdateUser(tt.args.ctx, tt.args.id, tt.args.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("source.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -536,9 +552,13 @@ func Test_source_DeleteUser(t *testing.T) {
 				db: sqlx.NewDb(db, "sqlmock"),
 			}
 
+			usersSource := &UserSourсe{
+				db: s.db,
+			}
+
 			tt.setup(tt.args, f)
 
-			if err := s.DeleteUser(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
+			if err := usersSource.DeleteUser(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
 				t.Errorf("source.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
