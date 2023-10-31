@@ -12,6 +12,9 @@ type UserHandlers interface {
 	GetByUsernameHandler(c *gin.Context)
 	UpdateHandler(c *gin.Context)
 	DeleteHandler(c *gin.Context)
+	LikeTrack(c *gin.Context)
+	DislikeTrack(c *gin.Context)
+	ShowLikedTracks(c *gin.Context)
 }
 
 type AuthHandlers interface {

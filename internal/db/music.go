@@ -20,7 +20,10 @@ func NewMusicSource(source *source) *musicSource {
 
 func (m *musicSource) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
 	var data []entity.MusicShow
-	rows, err := m.db.Query("Select name from music")
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	rows, err := m.db.QueryxContext(dbCtx, "Select name from music")
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +50,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	row := m.db.QueryRowxContext(dbCtx, "Update music set name = $1 where id=$2", musicUpdate.Name, musicUpdate.Id)
+	row := m.db.QueryRowxContext(dbCtx, "Update music set name = $1 where id=$2", musicUpdate.Name, musicUpdate.Id.String())
 	if row.Err() != nil {
 		return row.Err()
 	}
@@ -57,7 +60,7 @@ func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) e
 func (m *musicSource) Delete(ctx context.Context, id *entity.MusicID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	row := m.db.QueryRowxContext(dbCtx, "Delete from music where id = $1", id.Id)
+	row := m.db.QueryRowxContext(dbCtx, "Delete from music where id = $1", id.String())
 	if row.Err() != nil {
 		return row.Err()
 	}

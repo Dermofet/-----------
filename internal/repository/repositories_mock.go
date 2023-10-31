@@ -108,3 +108,13 @@ func (mr *MockUserRepositoryMockRecorder) Update(ctx, id, user interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserRepository)(nil).Update), ctx, id, user)
 }
+
+func (m *MockUserRepository) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error{
+	return nil
+}
+func (m *MockUserRepository) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error{
+	return nil
+}
+func (m *MockUserRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error){
+	return nil, nil
+}

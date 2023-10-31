@@ -12,6 +12,9 @@ type UserRepository interface {
 	GetByUsername(ctx context.Context, username string) (*entity.User, error)
 	Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error)
 	Delete(ctx context.Context, id *entity.UserID) error
+	LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
+	DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
+	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error)
 }
 
 type MusicRepository interface {

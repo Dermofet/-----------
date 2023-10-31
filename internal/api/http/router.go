@@ -119,6 +119,9 @@ func (r *router) registerRoutes() error {
 		userGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
 		userGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
 		userGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
+		userGroup.POST("/getTrack", r.handlers.userHandlers.LikeTrack)
+		userGroup.POST("/dropTrack", r.handlers.userHandlers.DislikeTrack)
+		userGroup.POST("/myTracks", r.handlers.userHandlers.ShowLikedTracks)
 	}
 
 	musicGroup := basePath.Group("/music")
@@ -128,8 +131,8 @@ func (r *router) registerRoutes() error {
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
 		//Admin Middleware
 		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
-		musicGroup.PATCH("/update", r.handlers.musicHandlers.Update)
-		musicGroup.DELETE("/delete", r.handlers.musicHandlers.Delete)
+		musicGroup.PATCH("/update/:id", r.handlers.musicHandlers.Update)
+		musicGroup.DELETE("/delete/:id", r.handlers.musicHandlers.Delete)
 	}
 
 	return nil
