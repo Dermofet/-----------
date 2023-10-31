@@ -7,6 +7,7 @@ import (
 	"music-backend-test/internal/api/http/middlewares"
 	"music-backend-test/internal/api/http/presenter"
 	"music-backend-test/internal/db"
+	"music-backend-test/internal/entity"
 	"music-backend-test/internal/repository"
 	"music-backend-test/internal/usecase"
 	"net/http"
@@ -103,17 +104,19 @@ func (r *router) registerRoutes() error {
 	authGroup.POST("/signup", r.handlers.authHandlers.SignUp)
 	authGroup.POST("/signin", r.handlers.authHandlers.SignIn)
 
-	userGroup := basePath.Group("/users")
+	forAllUserGroup := basePath.Group("/users")
 	{
-		userGroup.Use(middlewares.NewAuthMiddleware())
+		forAllUserGroup.Use(middlewares.NewAuthMiddleware())
+		forAllUserGroup.Use(middlewares.NewCheckRoleMiddleware([]string{entity.UserRole, entity.AdminRole}, userInteractor))
+
 		r.handlers.userHandlers = handlers.NewUserHandlers(userInteractor, userPresenter)
-		userGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
-		userGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
-		userGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
-		userGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
-		userGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
-		userGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
-		userGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
+		forAllUserGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
+		forAllUserGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
+		forAllUserGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
+		forAllUserGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
+		forAllUserGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
+		forAllUserGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
+		forAllUserGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
 	}
 
 	return nil

@@ -24,32 +24,19 @@ type UserDB struct {
 	ID       uuid.UUID `db:"id"`       // ID
 	Username string    `db:"username"` // Имя пользователя
 	Password string    `db:"password"` // Пароль
+	Role     string    `db:"role"`     // Роль
 }
 
 // Представление пользователя
 type User struct {
 	ID       *UserID // ID
 	Username string  // Имя пользователя
+	Role     string  // Роль
 }
 
 // Представление пользователя для создания записи в бд
 type UserCreate struct {
-	Username string // Имя пользователя
-	Password string // Пароль
+	Username string `json:"username"` // Имя пользователя
+	Password string `json:"password"` // Пароль
+	Role     string `json:"role"`     // Роль
 }
-
-// Представление пользователя для создания записи в бд
-// type UserCreate struct {
-// 	FirstName  string // Имя
-// 	SecondName string // Отчество
-// 	LastName   string // Фамилия
-// 	Password   string // Пароль
-// 	Age        int    // Возраст
-// 	Email      string // Электронная почта
-// 	Phone      string // Номер телефона
-// }
-
-// type UserSignIn struct {
-// 	Email    string // Электронная почта
-// 	Password string // Пароль
-// }
