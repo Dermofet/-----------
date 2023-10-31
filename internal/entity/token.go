@@ -12,6 +12,10 @@ type Token struct {
 	Token *jwt.Token
 }
 
+type TokenShow struct {
+	Token string `json:"token"`
+}
+
 func (t *Token) String() (string, error) {
 	cfg, err := config.GetAppConfig()
 	if err != nil {

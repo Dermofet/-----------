@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"music-backend-test/internal/api/http/presenter"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
 	"net/http"
@@ -13,21 +14,23 @@ import (
 
 type musicHandlers struct {
 	interactor usecase.MusicInteractor
+	presenter  presenter.MusicPresenter
 }
 
-func NewMusicHandlers(interactor usecase.MusicInteractor) *musicHandlers {
+func NewMusicHandlers(interactor usecase.MusicInteractor, presenter presenter.MusicPresenter) *musicHandlers {
 	return &musicHandlers{
 		interactor: interactor,
+		presenter:  presenter,
 	}
 }
 
 func (m *musicHandlers) GetAll(c *gin.Context) {
 	ctx := context.Background()
-	music, err := m.interactor.GetAll(ctx)
+	musics, err := m.interactor.GetAll(ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
 	}
-	c.JSON(http.StatusOK, music) //Проверить вывод
+	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics)) //Проверить вывод
 }
 
 func (m *musicHandlers) Create(c *gin.Context) {

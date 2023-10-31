@@ -18,16 +18,16 @@ func NewMusicSource(source *source) *musicSource {
 	}
 }
 
-func (m *musicSource) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
-	var data []entity.MusicShow
-	rows, err := m.db.Query("Select name from music")
+func (m *musicSource) GetAll(ctx context.Context) ([]*entity.Music, error) {
+	var data []*entity.Music
+	rows, err := m.db.Query("SELECT name FROM music")
 	if err != nil {
 		return nil, err
 	}
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.MusicShow
+		var scanEntity entity.Music
 		rows.Scan(&scanEntity.Name)
-		data = append(data, scanEntity)
+		data = append(data, &scanEntity)
 	}
 	return data, nil
 }
@@ -37,7 +37,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 	defer dbCancel()
 
 	newuuid := uuid.New()
-	row := m.db.QueryRowxContext(dbCtx, "Insert into music (id, name) values($1, $2)", newuuid, musicCreate.Name)
+	row := m.db.QueryRowxContext(dbCtx, "INSERT INTO music (id, name) VALUES ($1, $2)", newuuid, musicCreate.Name)
 	if row.Err() != nil {
 		return row.Err()
 	}
@@ -47,7 +47,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	row := m.db.QueryRowxContext(dbCtx, "Update music set name = $1 where id=$2", musicUpdate.Name, musicUpdate.Id)
+	row := m.db.QueryRowxContext(dbCtx, "UPDATE music SET name = $1 WHERE id = $2", musicUpdate.Name, musicUpdate.Id)
 	if row.Err() != nil {
 		return row.Err()
 	}
@@ -57,7 +57,7 @@ func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) e
 func (m *musicSource) Delete(ctx context.Context, id *entity.MusicID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	row := m.db.QueryRowxContext(dbCtx, "Delete from music where id = $1", id.Id)
+	row := m.db.QueryRowxContext(dbCtx, "DELETE FROM music WHERE id = $1", id.Id)
 	if row.Err() != nil {
 		return row.Err()
 	}

@@ -15,7 +15,7 @@ type UserInteractor interface {
 }
 
 type MusicInteractor interface {
-	GetAll(ctx context.Context) ([]entity.MusicShow, error)
+	GetAll(ctx context.Context) ([]*entity.Music, error)
 	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
 	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error

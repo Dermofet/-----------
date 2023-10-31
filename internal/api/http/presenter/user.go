@@ -12,9 +12,10 @@ func NewUserPresenter() *userPresenter {
 	return &userPresenter{}
 }
 
-func (u *userPresenter) ToUserView(user *entity.User) *view.UserView {
+func (p *userPresenter) ToUserView(user *entity.User) *view.UserView {
 	return &view.UserView{
-		ID:       user.ID.String(),
+		Id:       user.ID.String(),
 		Username: user.Username,
+		Role:     user.Role,
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"music-backend-test/internal/api/http/presenter"
-	_ "music-backend-test/internal/api/http/view"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
 	"net/http"

@@ -97,12 +97,17 @@ func (r *router) registerRoutes() error {
 	pgSource := db.NewSource(r.db)
 	userSource := db.NewUserSourсe(pgSource)
 	musicSource := db.NewMusicSource(pgSource)
+
 	userRepository := repository.NewUserRepository(userSource)
 	musicRepository := repository.NewMusicRepositiry(musicSource)
+
 	userInteractor := usecase.NewUserInteractor(userRepository)
 	musicInteractor := usecase.NewMusicInteractor(musicRepository)
+
 	userPresenter := presenter.NewUserPresenter()
 	tokenPresenter := presenter.NewTokenPresenter()
+	musicPresenter := presenter.NewMusicPresenter()
+
 	r.handlers.authHandlers = handlers.NewAuthHandlers(userInteractor, tokenPresenter)
 
 	authGroup := basePath.Group("/auth")
@@ -120,19 +125,21 @@ func (r *router) registerRoutes() error {
 		forAllUserGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
 		forAllUserGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
 		forAllUserGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
-		forAllUserGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
-		forAllUserGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
+		forAllUserGroup.PUT("/:id", r.handlers.userHandlers.UpdateHandler)
+		forAllUserGroup.DELETE("/:id", r.handlers.userHandlers.DeleteHandler)
 	}
 
+	r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor, musicPresenter)
 	musicGroup := basePath.Group("/music")
 	{
-		// musicGroup.Use(middlewares.NewAuthMiddleware())
-		r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor)
+		musicGroup.Use(middlewares.NewAuthMiddleware())
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
-		//Admin Middleware
-		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
-		musicGroup.PATCH("/update", r.handlers.musicHandlers.Update)
-		musicGroup.DELETE("/delete", r.handlers.musicHandlers.Delete)
+		musicGroup.POST("/create", r.handlers.musicHandlers.Create).
+			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
+		musicGroup.PATCH("/update/:id", r.handlers.musicHandlers.Update).
+			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
+		musicGroup.DELETE("/delete/:id", r.handlers.musicHandlers.Delete).
+			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package view
 
 type UserView struct {
-	ID       string `json:"id"`   // ID
-	Username string `json:"name"` // Имя пользователя
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
 }

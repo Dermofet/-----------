@@ -16,12 +16,12 @@ func NewMusicRepositiry(source db.MusicSource) *musicRepository {
 	}
 }
 
-func (m *musicRepository) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
-	music, err := m.source.GetAll(ctx)
+func (m *musicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
+	musics, err := m.source.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return music, nil
+	return musics, nil
 }
 
 func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
@@ -32,8 +32,8 @@ func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicC
 	return nil
 }
 
-func (m *musicRepository) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
-	err := m.source.Update(ctx, musicUpdate)
+func (m *musicRepository) Update(ctx context.Context, id *entity.MusicID, musicUpdate *entity.MusicDB) error {
+	err := m.source.Update(ctx, id, musicUpdate)
 	if err != nil {
 		return err
 	}

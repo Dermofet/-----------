@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"fmt"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
@@ -20,7 +21,8 @@ func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteracto
 			return
 		}
 
-		user, err := userInteractor.GetById(c, userId.(*entity.UserID))
+		ctx := context.Background()
+		user, err := userInteractor.GetById(ctx, userId.(*entity.UserID))
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("can't get user: %w", err))
 			return
