@@ -12,6 +12,9 @@ type UserSource interface {
 	GetUserByUsername(ctx context.Context, email string) (*entity.UserDB, error)
 	UpdateUser(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.UserDB, error)
 	DeleteUser(ctx context.Context, id *entity.UserID) error
+	LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
+	DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
+	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error)
 }
 
 type MusicSource interface {

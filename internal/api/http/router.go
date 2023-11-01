@@ -120,13 +120,16 @@ func (r *router) registerRoutes() error {
 		forAllUserGroup.Use(middlewares.NewCheckRoleMiddleware([]string{entity.UserRole, entity.AdminRole}, userInteractor))
 
 		r.handlers.userHandlers = handlers.NewUserHandlers(userInteractor, userPresenter)
-		forAllUserGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
-		forAllUserGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
-		forAllUserGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
-		forAllUserGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
-		forAllUserGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
-		forAllUserGroup.PUT("/:id", r.handlers.userHandlers.UpdateHandler)
-		forAllUserGroup.DELETE("/:id", r.handlers.userHandlers.DeleteHandler)
+		userGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
+		userGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
+		userGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
+		userGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
+		userGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
+		userGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
+		userGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
+		userGroup.POST("/getTrack", r.handlers.userHandlers.LikeTrack)
+		userGroup.POST("/dropTrack", r.handlers.userHandlers.DislikeTrack)
+		userGroup.POST("/myTracks", r.handlers.userHandlers.ShowLikedTracks)
 	}
 
 	r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor, musicPresenter)
@@ -134,12 +137,10 @@ func (r *router) registerRoutes() error {
 	{
 		musicGroup.Use(middlewares.NewAuthMiddleware())
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
-		musicGroup.POST("/create", r.handlers.musicHandlers.Create).
-			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
-		musicGroup.PATCH("/update/:id", r.handlers.musicHandlers.Update).
-			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
-		musicGroup.DELETE("/delete/:id", r.handlers.musicHandlers.Delete).
-			Use(middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor))
+		//Admin Middleware
+		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
+		musicGroup.PATCH("/update", r.handlers.musicHandlers.Update)
+		musicGroup.DELETE("/delete", r.handlers.musicHandlers.Delete)
 	}
 
 	return nil

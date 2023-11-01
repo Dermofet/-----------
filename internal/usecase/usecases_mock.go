@@ -108,3 +108,15 @@ func (mr *MockUserInteractorMockRecorder) Update(ctx, id, user interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserInteractor)(nil).Update), ctx, id, user)
 }
+
+func (mr *MockUserInteractorMockRecorder) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) *gomock.Call{
+	return nil
+}
+
+func (mr *MockUserInteractorMockRecorder) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) *gomock.Call{
+	return nil
+}
+
+func (mr *MockUserInteractorMockRecorder) ShowLikedTracks(ctx context.Context, id *entity.UserID) *gomock.Call{
+	return nil
+}

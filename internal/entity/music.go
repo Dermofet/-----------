@@ -29,3 +29,7 @@ type MusicDB struct {
 type MusicCreate struct {
 	Name string `json:"name"`
 }
+
+func (m *MusicID) String() string {
+	return m.Id.String()
+}

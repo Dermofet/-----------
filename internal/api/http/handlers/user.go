@@ -295,3 +295,66 @@ func (h *userHandlers) DeleteHandler(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func (h *userHandlers) LikeTrack(c *gin.Context) {
+	ctx := context.Background()
+	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get track now: %w", err))
+		return
+	}
+
+	body, err := c.GetRawData()
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
+		return
+	}
+
+	var trackId *entity.MusicID
+	err = json.Unmarshal(body, &trackId)
+	err = h.interactor.LikeTrack(ctx, userId, trackId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get track now: %w", err))
+		return
+	}
+
+}
+
+func (h *userHandlers) DislikeTrack(c *gin.Context) {
+	ctx := context.Background()
+	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete track now: %w", err))
+		return
+	}
+
+	body, err := c.GetRawData()
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
+		return
+	}
+
+	var trackId *entity.MusicID
+	err = json.Unmarshal(body, &trackId)
+	err = h.interactor.DislikeTrack(ctx, userId, trackId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete track now: %w", err))
+		return
+	}
+
+}
+
+func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
+	ctx := context.Background()
+	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get tracks now: %w", err))
+		return
+	}
+	data, err := h.interactor.ShowLikedTracks(ctx, userId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get tracks now: %w", err))
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}

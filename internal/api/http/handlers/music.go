@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type musicHandlers struct {
@@ -63,6 +64,7 @@ func (m *musicHandlers) Update(c *gin.Context) {
 	}
 
 	var music entity.MusicDB
+	music.Id, err = uuid.Parse(c.Param("id"))
 	err = json.Unmarshal(body, &music)
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
@@ -77,14 +79,10 @@ func (m *musicHandlers) Update(c *gin.Context) {
 
 func (m *musicHandlers) Delete(c *gin.Context) {
 	ctx := context.Background()
-	body, err := c.GetRawData()
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
-		return
-	}
 
 	var musicId entity.MusicID
-	err = json.Unmarshal(body, &musicId)
+	var err error
+	musicId.Id, err = uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
 		return

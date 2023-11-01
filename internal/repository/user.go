@@ -99,3 +99,30 @@ func (u *userRepository) Delete(ctx context.Context, id *entity.UserID) error {
 
 	return nil
 }
+
+func (u *userRepository) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+	err := u.source.LikeTrack(ctx, userId, trackId)
+	if err != nil {
+		return fmt.Errorf("can't get track from db: %w", err)
+	}
+
+	return nil
+}
+
+func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+	err := u.source.DislikeTrack(ctx, userId, trackId)
+	if err != nil {
+		return fmt.Errorf("can't drop track from db: %w", err)
+	}
+
+	return nil
+}
+
+func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error) {
+	data, err := u.source.ShowLikedTracks(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("can't get users tracks from db: %w", err)
+	}
+
+	return data, nil
+}

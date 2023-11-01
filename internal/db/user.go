@@ -98,10 +98,60 @@ func (u *UserSourсe) DeleteUser(ctx context.Context, id *entity.UserID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
+	// row := u.db.QueryRowxContext(dbCtx, "DELETE FROM user_music WHERE user_id = $1", id.String())
+	// if row.Err() != nil {
+	// 	return fmt.Errorf("can't exec query: %w", row.Err())
+	// }
 	row := u.db.QueryRowxContext(dbCtx, "DELETE FROM users WHERE id = $1", id.String())
 	if row.Err() != nil {
 		return fmt.Errorf("can't exec query: %w", row.Err())
 	}
 
 	return nil
+}
+
+func (u *UserSourсe) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	row := u.db.QueryRowxContext(dbCtx, "Insert into user_music (user_id, music_id) values ($1, $2)", userId.String(), trackId.String())
+	if row.Err() != nil {
+		return row.Err()
+	}
+
+	return nil
+}
+
+func (u *UserSourсe) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	row := u.db.QueryRowxContext(dbCtx, "Delete from user_music where user_id = $1 AND music_id = $2", userId.String(), trackId.String())
+	if row.Err() != nil {
+		return row.Err()
+	}
+
+	return nil
+}
+
+func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error) {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+	var data []entity.MusicShow
+
+	rows, err := u.db.QueryxContext(
+		dbCtx,
+		"Select name from music Join user_music on music.id = user_music.music_id where user_music.user_id = $1",
+		id.String())
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; rows.Next(); i++ {
+		var scanEntity entity.MusicShow
+		rows.Scan(&scanEntity.Name)
+		data = append(data, scanEntity)
+	}
+
+	return data, nil
 }
