@@ -332,6 +332,13 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 		return
 	}
 
+	userId := &entity.UserID{}
+	err = userId.FromString(id.(string))
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("invalid id: %w", err))
+		return
+	}
+
 	err = h.interactor.LikeTrack(ctx, userId, trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.LikeTrack: %w", err))
@@ -374,6 +381,13 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 	err = json.Unmarshal(body, &trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		return
+	}
+
+	userId := &entity.UserID{}
+	err = userId.FromString(id.(string))
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("invalid id: %w", err))
 		return
 	}
 

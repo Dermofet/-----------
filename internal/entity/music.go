@@ -28,23 +28,8 @@ func (c CustomDate) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, c.Time.Format("2006-01-02"))), nil
 }
 
-type MusicShow struct {
-	Name string `db:"name"`
-}
-
 type MusicID struct {
 	Id uuid.UUID `db:"id"`
-}
-
-type MusicDB struct {
-	Id      uuid.UUID  `db:"id"`
-	Name    string     `db:"name"`
-	Release CustomDate `db:"release"`
-}
-
-type MusicCreate struct {
-	Name    string     `db:"name"`
-	Release CustomDate `db:"release"`
 }
 
 func (m *MusicID) String() string {
@@ -63,10 +48,12 @@ type Music struct {
 }
 
 type MusicDB struct {
-	Id   uuid.UUID `db:"id"`
-	Name string    `db:"name"`
+	Id      uuid.UUID `db:"id"`
+	Name    string    `db:"name"`
+	Release time.Time `db:"release_date"`
 }
 
 type MusicCreate struct {
-	Name string `json:"name"`
+	Name    string     `db:"name"`
+	Release CustomDate `db:"release_date"`
 }

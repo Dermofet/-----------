@@ -26,8 +26,8 @@ func (m *musicInteractor) GetAll(ctx context.Context) ([]*entity.Music, error) {
 	return music, nil
 }
 
-func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error) {
-	musics, err := m.repo.GetAll(ctx)
+func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
+	musics, err := m.repo.GetAllSortByTime(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("can't get musics from repository: %w", err)
 	}

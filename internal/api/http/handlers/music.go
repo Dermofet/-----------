@@ -46,19 +46,68 @@ func (m *musicHandlers) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, music)
+	c.JSON(http.StatusOK, musics)
 }
 
+// GetAndSortByPopularHandler godoc
+// @Summary Получение треков отсортированных по популярности
+// @Description Получение треков отсортированных по популярности
+// @Tags Music
+// @Accept json
+// @Produce plain
+// @Security JwtAuth
+// @Success 200 {object} []view.MusicView "Список треков"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Пользователь не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /music/popular [get]
+func (m *musicHandlers) GetAndSortByPopular(c *gin.Context) {
+	ctx := context.Background()
+	musics, err := m.interactor.GetAndSortByPopular(ctx)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
+	}
+	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics))
+}
+
+// GetAllSortByTimeHandler godoc
+// @Summary Получение треков отсортированных по популярности
+// @Description Получение треков отсортированных по популярности
+// @Tags Music
+// @Accept json
+// @Produce plain
+// @Security JwtAuth
+// @Success 200 {object} []view.MusicView "Список треков"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Пользователь не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /music/release [get]
 func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 	ctx := context.Background()
-	music, err := m.interactor.GetAll(ctx)
+	musics, err := m.interactor.GetAllSortByTime(ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAllSortByTime: %w", err))
 		return
 	}
-	c.JSON(http.StatusOK, music) //Проверить вывод
+	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics)) //Проверить вывод
 }
 
+// CreateHandler godoc
+// @Summary Создание трека
+// @Description Создание нового трека
+// @Tags Music
+// @Accept json
+// @Produce plain
+// @Security JwtAuth
+// @Param request body entity.MusicCreate true "Данные трека"
+// @Success 201 "Трек создан"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Пользователь не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /music/new [post]
 func (m *musicHandlers) Create(c *gin.Context) {
 	ctx := context.Background()
 

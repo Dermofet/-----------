@@ -14,13 +14,13 @@ type UserSource interface {
 	DeleteUser(ctx context.Context, id *entity.UserID) error
 	LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
 	DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
-	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error)
+	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.MusicDB, error)
 }
 
 type MusicSource interface {
 	GetAll(ctx context.Context) ([]*entity.MusicDB, error)
 	GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error)
-	GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error)
+	GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error)
 	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
 	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error

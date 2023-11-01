@@ -128,27 +128,27 @@ func (u *UserSourсe) DislikeTrack(ctx context.Context, userId *entity.UserID, t
 	return nil
 }
 
-func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
+func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.MusicDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	var data []*entity.Music
 
 	rows, err := u.db.QueryxContext(
 		dbCtx,
-		"Select name from music Join user_music on music.id = user_music.music_id where user_music.user_id = $1",
+		"SELECT name FROM music JOIN user_music ON music.id = user_music.music_id WHERE user_music.user_id = $1",
 		id.String(),
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	var data []*entity.MusicDB
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.MusicShow
+		var scanEntity entity.MusicDB
 		err := rows.StructScan(&scanEntity)
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, scanEntity)
+		data = append(data, &scanEntity)
 	}
 
 	return data, nil

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"fmt"
 	"music-backend-test/internal/db"
 	"music-backend-test/internal/entity"
 )
@@ -37,16 +36,23 @@ func (m *musicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
 func (m *musicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
 	musicsDB, err := m.source.GetAndSortByPopular(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from db: %w", fmt.Errorf("/db/music.GetAll: %w", err)
+		return nil, fmt.Errorf("can't get musics from db: %w", err)
 	}
 
-	return music, nil
+	musics := make([]*entity.Music, len(musicsDB))
+	for i, musicDB := range musicsDB {
+		musics[i] = &entity.Music{
+			Id:   &entity.MusicID{Id: musicDB.Id},
+			Name: musicDB.Name,
+		}
+	}
+	return musics, nil
 }
 
-func (m *musicRepository) GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error) {
-	music, err := m.source.GetAll(ctx)
+func (m *musicRepository) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
+	musicsDB, err := m.source.GetAllSortByTime(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("/db/music.GetAll: %w", err))
+		return nil, fmt.Errorf("/db/music.GetAllSortByTime: %w", err)
 	}
 
 	musics := make([]*entity.Music, len(musicsDB))

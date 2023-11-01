@@ -218,6 +218,36 @@ func (mr *MockMusicRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockMusicRepository)(nil).GetAll), ctx)
 }
 
+// GetAllSortByTime mocks base method.
+func (m *MockMusicRepository) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllSortByTime", ctx)
+	ret0, _ := ret[0].([]*entity.Music)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllSortByTime indicates an expected call of GetAllSortByTime.
+func (mr *MockMusicRepositoryMockRecorder) GetAllSortByTime(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllSortByTime", reflect.TypeOf((*MockMusicRepository)(nil).GetAllSortByTime), ctx)
+}
+
+// GetAndSortByPopular mocks base method.
+func (m *MockMusicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAndSortByPopular", ctx)
+	ret0, _ := ret[0].([]*entity.Music)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAndSortByPopular indicates an expected call of GetAndSortByPopular.
+func (mr *MockMusicRepositoryMockRecorder) GetAndSortByPopular(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAndSortByPopular", reflect.TypeOf((*MockMusicRepository)(nil).GetAndSortByPopular), ctx)
+}
+
 // Update mocks base method.
 func (m *MockMusicRepository) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	m.ctrl.T.Helper()

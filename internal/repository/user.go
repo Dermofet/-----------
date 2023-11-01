@@ -125,10 +125,18 @@ func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID
 }
 
 func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
-	data, err := u.source.ShowLikedTracks(ctx, id)
+	musicsDB, err := u.source.ShowLikedTracks(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("/db/user.ShowLikedTracks: %w", err)
 	}
 
-	return data, nil
+	musics := make([]*entity.Music, len(musicsDB))
+	for i, musicDB := range musicsDB {
+		musics[i] = &entity.Music{
+			Id:   &entity.MusicID{Id: musicDB.Id},
+			Name: musicDB.Name,
+		}
+	}
+
+	return musics, nil
 }

@@ -1,8 +1,15 @@
 definitions:
+  entity.CustomDate:
+    properties:
+      time.Time:
+        type: string
+    type: object
   entity.MusicCreate:
     properties:
       name:
         type: string
+      release:
+        $ref: '#/definitions/entity.CustomDate'
     type: object
   entity.UserCreate:
     properties:
@@ -194,33 +201,6 @@ paths:
       summary: Получение всех треков
       tags:
       - Music
-  /music/catalog/popular:
-    get:
-      consumes:
-      - application/json
-      description: Получение треков отсортированных по популярности
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: Список треков
-          schema:
-            items:
-              $ref: '#/definitions/view.MusicView'
-            type: array
-        "400":
-          description: Некорректный запрос
-        "401":
-          description: Неавторизованный запрос
-        "404":
-          description: Пользователь не найден
-        "500":
-          description: Внутренняя ошибка сервера
-      security:
-      - JwtAuth: []
-      summary: Получение треков отсортированных по популярности
-      tags:
-      - Music
   /music/new:
     post:
       consumes:
@@ -249,6 +229,60 @@ paths:
       security:
       - JwtAuth: []
       summary: Создание трека
+      tags:
+      - Music
+  /music/popular:
+    get:
+      consumes:
+      - application/json
+      description: Получение треков отсортированных по популярности
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Список треков
+          schema:
+            items:
+              $ref: '#/definitions/view.MusicView'
+            type: array
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение треков отсортированных по популярности
+      tags:
+      - Music
+  /music/release:
+    get:
+      consumes:
+      - application/json
+      description: Получение треков отсортированных по популярности
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Список треков
+          schema:
+            items:
+              $ref: '#/definitions/view.MusicView'
+            type: array
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение треков отсортированных по популярности
       tags:
       - Music
   /users/{id}:

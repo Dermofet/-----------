@@ -151,7 +151,55 @@ const docTemplate = `{
                 }
             }
         },
-        "/music/catalog/popular": {
+        "/music/new": {
+            "post": {
+                "security": [
+                    {
+                        "JwtAuth": []
+                    }
+                ],
+                "description": "Создание нового трека",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Music"
+                ],
+                "summary": "Создание трека",
+                "parameters": [
+                    {
+                        "description": "Данные трека",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.MusicCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Трек создан"
+                    },
+                    "400": {
+                        "description": "Некорректный запрос"
+                    },
+                    "401": {
+                        "description": "Неавторизованный запрос"
+                    },
+                    "404": {
+                        "description": "Пользователь не найден"
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера"
+                    }
+                }
+            }
+        },
+        "/music/popular": {
             "get": {
                 "security": [
                     {
@@ -194,14 +242,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/music/new": {
-            "post": {
+        "/music/release": {
+            "get": {
                 "security": [
                     {
                         "JwtAuth": []
                     }
                 ],
-                "description": "Создание нового трека",
+                "description": "Получение треков отсортированных по популярности",
                 "consumes": [
                     "application/json"
                 ],
@@ -211,21 +259,16 @@ const docTemplate = `{
                 "tags": [
                     "Music"
                 ],
-                "summary": "Создание трека",
-                "parameters": [
-                    {
-                        "description": "Данные трека",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.MusicCreate"
-                        }
-                    }
-                ],
+                "summary": "Получение треков отсортированных по популярности",
                 "responses": {
-                    "201": {
-                        "description": "Трек создан"
+                    "200": {
+                        "description": "Список треков",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.MusicView"
+                            }
+                        }
                     },
                     "400": {
                         "description": "Некорректный запрос"
@@ -798,11 +841,22 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.CustomDate": {
+            "type": "object",
+            "properties": {
+                "time.Time": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.MusicCreate": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
+                },
+                "release": {
+                    "$ref": "#/definitions/entity.CustomDate"
                 }
             }
         },

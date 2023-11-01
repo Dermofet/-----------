@@ -54,12 +54,35 @@ func (m *musicSource) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicD
 
 	var data []*entity.MusicDB
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.MusicShow
+		var scanEntity entity.MusicDB
 		err := rows.StructScan(&scanEntity)
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, scanEntity)
+		data = append(data, &scanEntity)
+	}
+
+	return data, nil
+}
+
+func (m *musicSource) GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error) {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	rows, err := m.db.QueryxContext(dbCtx, "SELECT * FROM music ORDER BY release_date")
+	if err != nil {
+		return nil, err
+	}
+
+	var data []*entity.MusicDB
+	for i := 0; rows.Next(); i++ {
+		var scanEntity entity.MusicDB
+		err := rows.StructScan(&scanEntity)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(scanEntity)
+		data = append(data, &scanEntity)
 	}
 
 	return data, nil

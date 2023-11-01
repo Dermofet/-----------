@@ -158,7 +158,7 @@ func (r *router) registerRoutes() error {
 
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
 		musicGroup.GET("/release", r.handlers.musicHandlers.GetAllSortByTime)
-		musicGroup.GET("/catalog/popular", r.handlers.musicHandlers.GetAndSortByPopular)
+		musicGroup.GET("/popular", r.handlers.musicHandlers.GetAndSortByPopular)
 		musicGroup.POST(
 			"/new",
 			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
