@@ -19,9 +19,9 @@ func (p *musicPresenter) ToMusicView(music *entity.Music) *view.MusicView {
 }
 
 func (p *musicPresenter) ToListMusicView(musics []*entity.Music) []*view.MusicView {
-	list := make([]*view.MusicView, len(musics))
-	for _, music := range musics {
-		list = append(list, p.ToMusicView(music))
+	view := make([]*view.MusicView, len(musics))
+	for i, music := range musics {
+		view[i] = p.ToMusicView(music)
 	}
-	return list
+	return view
 }

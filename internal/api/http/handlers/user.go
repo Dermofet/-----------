@@ -161,7 +161,7 @@ func (h *userHandlers) DeleteMeHandler(c *gin.Context) {
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Пользователь не найден"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/{id} [get]
+// @Router /users/id/{id} [get]
 func (h *userHandlers) GetByIdHandler(c *gin.Context) {
 	ctx := context.Background()
 
@@ -198,7 +198,7 @@ func (h *userHandlers) GetByIdHandler(c *gin.Context) {
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Пользователь не найден"
 // @Failure 500 "Внутренняя ошибка сервера"
-// @Router /users/{username} [get]
+// @Router /users/username/{username} [get]
 func (h *userHandlers) GetByUsernameHandler(c *gin.Context) {
 	ctx := context.Background()
 
@@ -296,9 +296,23 @@ func (h *userHandlers) DeleteHandler(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// LikeTrackHandler godoc
+// @Summary Добавить трека в список понравившихся
+// @Description Добавление трека в список понравившихся
+// @Tags Users
+// @Accept json
+// @Produce plain
+// @Security JwtAuth
+// @Param id path string true "Уникальный идентификатор трека (UUID)"
+// @Success 201 "Трек успешно добавлен в список понравившихся"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Трек не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /users/add-track/{id} [post]
 func (h *userHandlers) LikeTrack(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	userId, err := entity.ParseToken(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get track now: %w", err))
 		return
@@ -312,6 +326,11 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 
 	var trackId *entity.MusicID
 	err = json.Unmarshal(body, &trackId)
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		return
+	}
+
 	err = h.interactor.LikeTrack(ctx, userId, trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get track now: %w", err))
@@ -320,9 +339,23 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 
 }
 
+// RemoveTrackHandler godoc
+// @Summary Удалить трек из списка понравившихся
+// @Description Удаление трека из списка понравившихся
+// @Tags Users
+// @Accept json
+// @Produce plain
+// @Param id path string true "Уникальный идентификатор трека (UUID)"
+// @Security JwtAuth
+// @Success 204 "Трек успешно удален из списка понравившихся"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Трек не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /users/remove-track/{id} [delete]
 func (h *userHandlers) DislikeTrack(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	userId, err := entity.ParseToken(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete track now: %w", err))
 		return
@@ -336,6 +369,11 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 
 	var trackId *entity.MusicID
 	err = json.Unmarshal(body, &trackId)
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		return
+	}
+
 	err = h.interactor.DislikeTrack(ctx, userId, trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete track now: %w", err))
@@ -344,9 +382,22 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 
 }
 
+// ShowLikedTracksHandler godoc
+// @Summary Показать понравившиеся треки
+// @Description Получение списка понравившихся треков
+// @Tags Users
+// @Accept json
+// @Produce plain
+// @Security JwtAuth
+// @Success 200 {object} view.ListMusicView
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Трек не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /users/get-liked-tracks [get]
 func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
+	userId, err := entity.ParseToken(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get tracks now: %w", err))
 		return

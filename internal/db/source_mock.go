@@ -64,6 +64,20 @@ func (mr *MockUserSourceMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUserSource)(nil).DeleteUser), ctx, id)
 }
 
+// DislikeTrack mocks base method.
+func (m *MockUserSource) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DislikeTrack", ctx, userId, trackId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DislikeTrack indicates an expected call of DislikeTrack.
+func (mr *MockUserSourceMockRecorder) DislikeTrack(ctx, userId, trackId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DislikeTrack", reflect.TypeOf((*MockUserSource)(nil).DislikeTrack), ctx, userId, trackId)
+}
+
 // GetUserById mocks base method.
 func (m *MockUserSource) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
@@ -94,27 +108,126 @@ func (mr *MockUserSourceMockRecorder) GetUserByUsername(ctx, email interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUsername", reflect.TypeOf((*MockUserSource)(nil).GetUserByUsername), ctx, email)
 }
 
-// UpdateUser mocks base method.
-func (m *MockUserSource) UpdateUser(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.UserDB, error) {
+// LikeTrack mocks base method.
+func (m *MockUserSource) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUser", ctx, id, user)
+	ret := m.ctrl.Call(m, "LikeTrack", ctx, userId, trackId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// LikeTrack indicates an expected call of LikeTrack.
+func (mr *MockUserSourceMockRecorder) LikeTrack(ctx, userId, trackId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LikeTrack", reflect.TypeOf((*MockUserSource)(nil).LikeTrack), ctx, userId, trackId)
+}
+
+// ShowLikedTracks mocks base method.
+func (m *MockUserSource) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShowLikedTracks", ctx, id)
+	ret0, _ := ret[0].([]*entity.Music)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ShowLikedTracks indicates an expected call of ShowLikedTracks.
+func (mr *MockUserSourceMockRecorder) ShowLikedTracks(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowLikedTracks", reflect.TypeOf((*MockUserSource)(nil).ShowLikedTracks), ctx, id)
+}
+
+// UpdateUser mocks base method.
+func (m *MockUserSource) UpdateUser(ctx context.Context, userDB *entity.UserDB, user *entity.UserCreate) (*entity.UserDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, userDB, user)
 	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateUser indicates an expected call of UpdateUser.
-func (mr *MockUserSourceMockRecorder) UpdateUser(ctx, id, user interface{}) *gomock.Call {
+func (mr *MockUserSourceMockRecorder) UpdateUser(ctx, userDB, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUserSource)(nil).UpdateUser), ctx, id, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUserSource)(nil).UpdateUser), ctx, userDB, user)
 }
 
-func (m *MockUserSource) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error{
-	return nil
+// MockMusicSource is a mock of MusicSource interface.
+type MockMusicSource struct {
+	ctrl     *gomock.Controller
+	recorder *MockMusicSourceMockRecorder
 }
-func (m *MockUserSource) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error{
-	return nil
+
+// MockMusicSourceMockRecorder is the mock recorder for MockMusicSource.
+type MockMusicSourceMockRecorder struct {
+	mock *MockMusicSource
 }
-func (m *MockUserSource) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error){
-	return nil, nil
+
+// NewMockMusicSource creates a new mock instance.
+func NewMockMusicSource(ctrl *gomock.Controller) *MockMusicSource {
+	mock := &MockMusicSource{ctrl: ctrl}
+	mock.recorder = &MockMusicSourceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMusicSource) EXPECT() *MockMusicSourceMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockMusicSource) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, musicCreate)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockMusicSourceMockRecorder) Create(ctx, musicCreate interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMusicSource)(nil).Create), ctx, musicCreate)
+}
+
+// Delete mocks base method.
+func (m *MockMusicSource) Delete(ctx context.Context, id *entity.MusicID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockMusicSourceMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockMusicSource)(nil).Delete), ctx, id)
+}
+
+// GetAll mocks base method.
+func (m *MockMusicSource) GetAll(ctx context.Context) ([]*entity.Music, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret0, _ := ret[0].([]*entity.Music)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockMusicSourceMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockMusicSource)(nil).GetAll), ctx)
+}
+
+// Update mocks base method.
+func (m *MockMusicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockMusicSourceMockRecorder) Update(ctx, musicUpdate interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicSource)(nil).Update), ctx, musicUpdate)
 }

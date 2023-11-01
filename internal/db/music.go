@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"music-backend-test/internal/entity"
 
 	"github.com/google/uuid"
@@ -18,15 +19,44 @@ func NewMusicSource(source *source) *musicSource {
 	}
 }
 
-func (m *musicSource) GetAll(ctx context.Context) ([]*entity.Music, error) {
-	var data []*entity.Music
-	rows, err := m.db.Query("SELECT name FROM music")
+func (m *musicSource) GetAll(ctx context.Context) ([]*entity.MusicDB, error) {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	rows, err := m.db.QueryxContext(dbCtx, "SELECT * FROM music")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't exec query: %w", err)
 	}
+
+	var data []*entity.MusicDB
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.Music
-		rows.Scan(&scanEntity.Name)
+		var scanEntity entity.MusicDB
+		rows.StructScan(&scanEntity)
+		data = append(data, &scanEntity)
+	}
+	return data, nil
+}
+
+func (m *musicSource) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error) {
+	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
+	defer dbCancel()
+
+	rows, err := m.db.QueryxContext(dbCtx,
+		"SELECT m.id AS id, m.name AS name\n"+
+			"FROM music m\n"+
+			"LEFT JOIN user_music um ON um.music_id = m.id\n"+
+			"GROUP BY m.id, m.name\n"+
+			"ORDER BY COALESCE(COUNT(um.music_id), 0) DESC;",
+	)
+	if err != nil {
+		return nil, fmt.Errorf("can't exec query: %w", err)
+	}
+
+	var data []*entity.MusicDB
+	for i := 0; rows.Next(); i++ {
+		var scanEntity entity.MusicDB
+		rows.StructScan(&scanEntity)
+		fmt.Println(scanEntity)
 		data = append(data, &scanEntity)
 	}
 	return data, nil

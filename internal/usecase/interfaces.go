@@ -14,11 +14,12 @@ type UserInteractor interface {
 	Delete(ctx context.Context, id *entity.UserID) error
 	LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
 	DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
-	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error)
+	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error)
 }
 
 type MusicInteractor interface {
 	GetAll(ctx context.Context) ([]*entity.Music, error)
+	GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error)
 	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
 	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error

@@ -10,16 +10,17 @@ type UserSource interface {
 	CreateUser(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error)
 	GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error)
 	GetUserByUsername(ctx context.Context, email string) (*entity.UserDB, error)
-	UpdateUser(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.UserDB, error)
+	UpdateUser(ctx context.Context, userDB *entity.UserDB, user *entity.UserCreate) (*entity.UserDB, error)
 	DeleteUser(ctx context.Context, id *entity.UserID) error
 	LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
 	DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error
-	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error)
+	ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error)
 }
 
 type MusicSource interface {
-	GetAll(ctx context.Context) ([]*entity.Music, error)
+	GetAll(ctx context.Context) ([]*entity.MusicDB, error)
+	GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error)
 	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
-	Update(ctx context.Context, id *entity.MusicID, musicUpdate *entity.MusicDB) error
+	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error
 }

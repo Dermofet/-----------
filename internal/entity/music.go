@@ -3,7 +3,7 @@ package entity
 import "github.com/google/uuid"
 
 type MusicID struct {
-	Id uuid.UUID `json:"id"`
+	Id uuid.UUID
 }
 
 func (m *MusicID) String() string {
@@ -28,8 +28,4 @@ type MusicDB struct {
 
 type MusicCreate struct {
 	Name string `json:"name"`
-}
-
-func (m *MusicID) String() string {
-	return m.Id.String()
 }

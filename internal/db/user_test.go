@@ -357,9 +357,9 @@ func Test_source_UpdateUser(t *testing.T) {
 		db sqlmock.Sqlmock
 	}
 	type args struct {
-		ctx  context.Context
-		id   *entity.UserID
-		user *entity.UserCreate
+		ctx    context.Context
+		userDB *entity.UserDB
+		user   *entity.UserCreate
 	}
 	tests := []struct {
 		name    string
@@ -372,8 +372,10 @@ func Test_source_UpdateUser(t *testing.T) {
 			name: "success: Update source: user updated",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				userDB: &entity.UserDB{
+					ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+					Username: "Bob",
+					Password: "qwerty1234",
 				},
 				user: &entity.UserCreate{
 					Username: "John",
@@ -407,8 +409,10 @@ func Test_source_UpdateUser(t *testing.T) {
 			name: "error: Update source: can't exec query",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				userDB: &entity.UserDB{
+					ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+					Username: "Bob",
+					Password: "qwerty1234",
 				},
 				user: &entity.UserCreate{
 					Username: "John",
@@ -427,8 +431,10 @@ func Test_source_UpdateUser(t *testing.T) {
 			name: "error: Update source: can't scan user",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				userDB: &entity.UserDB{
+					ID:       uuid.Nil,
+					Username: "Bob",
+					Password: "qwerty1234",
 				},
 				user: &entity.UserCreate{
 					Username: "John",
@@ -465,7 +471,7 @@ func Test_source_UpdateUser(t *testing.T) {
 
 			tt.setup(tt.args, f)
 
-			got, err := usersSource.UpdateUser(tt.args.ctx, tt.args.id, tt.args.user)
+			got, err := usersSource.UpdateUser(tt.args.ctx, tt.args.userDB, tt.args.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("source.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return

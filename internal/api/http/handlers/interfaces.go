@@ -24,6 +24,7 @@ type AuthHandlers interface {
 
 type MusicHandlers interface {
 	GetAll(c *gin.Context)
+	GetAndSortByPopular(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)

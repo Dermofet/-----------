@@ -2,6 +2,6 @@ package entity
 
 // TODO: change string to type Role
 const (
-	AdminRole string = "admin"
-	UserRole  string = "user"
+	AdminRole string = "ADMIN"
+	UserRole  string = "USER"
 )

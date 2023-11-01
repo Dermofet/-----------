@@ -115,7 +115,12 @@ func (a *authHandlers) SignIn(c *gin.Context) {
 	}
 
 	if user == nil {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	if user.Password != signinUser.Password {
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 

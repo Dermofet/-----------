@@ -14,7 +14,6 @@ import (
 // The NewCheckAdminMiddleware function is a middleware that checks if the user is an admin.
 func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteractor) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if the user is an admin
 		userId, exists := c.Get("user-id")
 		if !exists {
 			c.AbortWithStatus(http.StatusUnauthorized)
@@ -28,6 +27,8 @@ func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteracto
 			return
 		}
 
+		fmt.Println(user.Role)
+		fmt.Println(roles)
 		if !slices.Contains(roles, user.Role) {
 			c.AbortWithStatus(http.StatusForbidden)
 			return

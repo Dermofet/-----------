@@ -84,7 +84,7 @@ func (u *userInteractor) DislikeTrack(ctx context.Context, userId *entity.UserID
 	return nil
 }
 
-func (u *userInteractor) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error) {
+func (u *userInteractor) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
 	data, err := u.repo.ShowLikedTracks(ctx, id)
 	if err != nil {
 		return nil, err

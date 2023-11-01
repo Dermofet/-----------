@@ -114,33 +114,65 @@ func (r *router) registerRoutes() error {
 	authGroup.POST("/signup", r.handlers.authHandlers.SignUp)
 	authGroup.POST("/signin", r.handlers.authHandlers.SignIn)
 
-	forAllUserGroup := basePath.Group("/users")
+	userGroup := basePath.Group("/users")
 	{
-		forAllUserGroup.Use(middlewares.NewAuthMiddleware())
-		forAllUserGroup.Use(middlewares.NewCheckRoleMiddleware([]string{entity.UserRole, entity.AdminRole}, userInteractor))
+		userGroup.Use(middlewares.NewAuthMiddleware())
 
 		r.handlers.userHandlers = handlers.NewUserHandlers(userInteractor, userPresenter)
 		userGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
 		userGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
 		userGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
-		userGroup.GET("/id/:id", r.handlers.userHandlers.GetByIdHandler)
+		userGroup.GET(
+			"/id/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.userHandlers.GetByIdHandler,
+		)
 		userGroup.GET("/username/:username", r.handlers.userHandlers.GetByUsernameHandler)
-		userGroup.PUT("/id/:id", r.handlers.userHandlers.UpdateHandler)
-		userGroup.DELETE("/id/:id", r.handlers.userHandlers.DeleteHandler)
-		userGroup.POST("/getTrack", r.handlers.userHandlers.LikeTrack)
-		userGroup.POST("/dropTrack", r.handlers.userHandlers.DislikeTrack)
-		userGroup.POST("/myTracks", r.handlers.userHandlers.ShowLikedTracks)
+		userGroup.PUT(
+			"/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.userHandlers.UpdateHandler,
+		)
+		userGroup.DELETE(
+			"/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.userHandlers.DeleteHandler,
+		)
+		userGroup.POST(
+			"/add-track/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.userHandlers.LikeTrack,
+		)
+		userGroup.DELETE(
+			"/remove-track/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.userHandlers.DislikeTrack,
+		)
+		userGroup.GET("/get-liked-tracks", r.handlers.userHandlers.ShowLikedTracks)
 	}
 
 	r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor, musicPresenter)
 	musicGroup := basePath.Group("/music")
 	{
 		musicGroup.Use(middlewares.NewAuthMiddleware())
+
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
-		//Admin Middleware
-		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
-		musicGroup.PATCH("/update", r.handlers.musicHandlers.Update)
-		musicGroup.DELETE("/delete", r.handlers.musicHandlers.Delete)
+		musicGroup.GET("/catalog/popular", r.handlers.musicHandlers.GetAndSortByPopular)
+		musicGroup.POST(
+			"/new",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.musicHandlers.Create,
+		)
+		musicGroup.PUT(
+			"/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.musicHandlers.Update,
+		)
+		musicGroup.DELETE(
+			"/:id",
+			middlewares.NewCheckRoleMiddleware([]string{entity.AdminRole}, userInteractor),
+			r.handlers.musicHandlers.Delete,
+		)
 	}
 
 	return nil

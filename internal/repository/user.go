@@ -41,6 +41,8 @@ func (u *userRepository) GetById(ctx context.Context, id *entity.UserID) (*entit
 			Id: user.ID,
 		},
 		Username: user.Username,
+		Password: user.Password,
+		Role:     user.Role,
 	}, nil
 }
 
@@ -58,11 +60,13 @@ func (u *userRepository) GetByUsername(ctx context.Context, username string) (*e
 			Id: user.ID,
 		},
 		Username: user.Username,
+		Password: user.Password,
+		Role:     user.Role,
 	}, nil
 }
 
 func (u *userRepository) Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error) {
-	_, err := u.source.GetUserById(ctx, id)
+	userDB, err := u.source.GetUserById(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, err
@@ -70,7 +74,7 @@ func (u *userRepository) Update(ctx context.Context, id *entity.UserID, user *en
 		return nil, fmt.Errorf("can't get user from db: %w", err)
 	}
 
-	dbUser, err := u.source.UpdateUser(ctx, id, user)
+	dbUser, err := u.source.UpdateUser(ctx, userDB, user)
 	if err != nil {
 		return nil, fmt.Errorf("Update: can't to update user: %w", err)
 	}
@@ -80,6 +84,8 @@ func (u *userRepository) Update(ctx context.Context, id *entity.UserID, user *en
 			Id: dbUser.ID,
 		},
 		Username: dbUser.Username,
+		Password: user.Password,
+		Role:     dbUser.Role,
 	}, nil
 }
 
@@ -118,7 +124,7 @@ func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID
 	return nil
 }
 
-func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error) {
+func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
 	data, err := u.source.ShowLikedTracks(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("can't get users tracks from db: %w", err)

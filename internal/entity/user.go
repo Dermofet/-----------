@@ -32,11 +32,11 @@ type User struct {
 	ID       *UserID // ID
 	Username string  // Имя пользователя
 	Role     string  // Роль
+	Password string  // Пароль
 }
 
 // Представление пользователя для создания записи в бд
 type UserCreate struct {
 	Username string `json:"username"` // Имя пользователя
 	Password string `json:"password"` // Пароль
-	Role     string `json:"role"`     // Роль
 }

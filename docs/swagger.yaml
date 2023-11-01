@@ -1,4 +1,9 @@
 definitions:
+  entity.MusicCreate:
+    properties:
+      name:
+        type: string
+    type: object
   entity.UserCreate:
     properties:
       password:
@@ -8,19 +13,32 @@ definitions:
         description: Имя пользователя
         type: string
     type: object
+  view.ListMusicView:
+    properties:
+      musics:
+        items:
+          $ref: '#/definitions/view.MusicView'
+        type: array
+    type: object
+  view.MusicView:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   view.TokenView:
     properties:
       token:
-        description: JWT токен
         type: string
     type: object
   view.UserView:
     properties:
       id:
-        description: ID
         type: string
-      name:
-        description: Имя пользователя
+      role:
+        type: string
+      username:
         type: string
     type: object
 host: localhost:8000
@@ -91,6 +109,148 @@ paths:
       summary: Регистрация пользователя
       tags:
       - Auth
+  /music/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление трека
+      parameters:
+      - description: id трека
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: Трек удален
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Удаление трека
+      tags:
+      - Music
+    put:
+      consumes:
+      - application/json
+      description: Обновление трека
+      parameters:
+      - description: Данные трека
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MusicCreate'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Трек обновлен
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Обновление трека
+      tags:
+      - Music
+  /music/catalog:
+    get:
+      consumes:
+      - application/json
+      description: Получение всех треков
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Данные трека
+          schema:
+            items:
+              $ref: '#/definitions/view.MusicView'
+            type: array
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение всех треков
+      tags:
+      - Music
+  /music/catalog/popular:
+    get:
+      consumes:
+      - application/json
+      description: Получение треков отсортированных по популярности
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Список треков
+          schema:
+            items:
+              $ref: '#/definitions/view.MusicView'
+            type: array
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение треков отсортированных по популярности
+      tags:
+      - Music
+  /music/new:
+    post:
+      consumes:
+      - application/json
+      description: Создание нового трека
+      parameters:
+      - description: Данные трека
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MusicCreate'
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Трек создан
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Создание трека
+      tags:
+      - Music
   /users/{id}:
     delete:
       consumes:
@@ -118,36 +278,6 @@ paths:
       security:
       - JwtAuth: []
       summary: Удаление пользователя по ID
-      tags:
-      - Users
-    get:
-      consumes:
-      - application/json
-      description: Получение информации о пользователе по его уникальному идентификатору.
-      parameters:
-      - description: Уникальный идентификатор пользователя (UUID)
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Данные пользователя
-          schema:
-            $ref: '#/definitions/view.UserView'
-        "400":
-          description: Некорректный запрос
-        "401":
-          description: Неавторизованный запрос
-        "404":
-          description: Пользователь не найден
-        "500":
-          description: Внутренняя ошибка сервера
-      security:
-      - JwtAuth: []
-      summary: Получение пользователя по ID
       tags:
       - Users
     put:
@@ -188,15 +318,69 @@ paths:
       summary: Обновление пользователя по ID
       tags:
       - Users
-  /users/{username}:
+  /users/add-track/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Добавление трека в список понравившихся
+      parameters:
+      - description: Уникальный идентификатор трека (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Трек успешно добавлен в список понравившихся
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Трек не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Добавить трека в список понравившихся
+      tags:
+      - Users
+  /users/get-liked-tracks:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка понравившихся треков
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.ListMusicView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Трек не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Показать понравившиеся треки
+      tags:
+      - Users
+  /users/id/{id}:
     get:
       consumes:
       - application/json
       description: Получение информации о пользователе по его уникальному идентификатору.
       parameters:
-      - description: Username пользователя
+      - description: Уникальный идентификатор пользователя (UUID)
         in: path
-        name: username
+        name: id
         required: true
         type: string
       produces:
@@ -216,7 +400,7 @@ paths:
           description: Внутренняя ошибка сервера
       security:
       - JwtAuth: []
-      summary: Получение пользователя по Username
+      summary: Получение пользователя по ID
       tags:
       - Users
   /users/me:
@@ -300,6 +484,66 @@ paths:
       security:
       - JwtAuth: []
       summary: Обновление пользователя по JWT токену
+      tags:
+      - Users
+  /users/remove-track/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление трека из списка понравившихся
+      parameters:
+      - description: Уникальный идентификатор трека (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: Трек успешно удален из списка понравившихся
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Трек не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Удалить трек из списка понравившихся
+      tags:
+      - Users
+  /users/username/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его уникальному идентификатору.
+      parameters:
+      - description: Username пользователя
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/view.UserView'
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Получение пользователя по Username
       tags:
       - Users
 schemes:
