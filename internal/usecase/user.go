@@ -69,7 +69,7 @@ func (u *userInteractor) Delete(ctx context.Context, id *entity.UserID) error {
 func (u *userInteractor) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
 	err := u.repo.LikeTrack(ctx, userId, trackId)
 	if err != nil {
-		return err
+		return fmt.Errorf("/repository/user.LikeTrack: %w", err)
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func (u *userInteractor) LikeTrack(ctx context.Context, userId *entity.UserID, t
 func (u *userInteractor) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
 	err := u.repo.DislikeTrack(ctx, userId, trackId)
 	if err != nil {
-		return err
+		return fmt.Errorf("/repository/user.DislikeTrack: %w", err)
 	}
 
 	return nil
@@ -87,7 +87,7 @@ func (u *userInteractor) DislikeTrack(ctx context.Context, userId *entity.UserID
 func (u *userInteractor) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]entity.MusicShow, error) {
 	data, err := u.repo.ShowLikedTracks(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("/repository/user.ShowLikedTracks: %w", err)
 	}
 
 	return data, nil

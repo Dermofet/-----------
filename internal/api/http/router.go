@@ -129,6 +129,7 @@ func (r *router) registerRoutes() error {
 		// musicGroup.Use(middlewares.NewAuthMiddleware())
 		r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor)
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
+		musicGroup.GET("/release", r.handlers.musicHandlers.GetAllSortByTime)
 		//Admin Middleware
 		musicGroup.POST("/create", r.handlers.musicHandlers.Create)
 		musicGroup.PATCH("/update/:id", r.handlers.musicHandlers.Update)

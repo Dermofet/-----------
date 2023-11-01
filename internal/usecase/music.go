@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/repository"
 )
@@ -19,7 +20,16 @@ func NewMusicInteractor(repo repository.MusicRepository) *musicInteractor {
 func (m *musicInteractor) GetAll(ctx context.Context) ([]entity.MusicShow, error) {
 	music, err := m.repo.GetAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("/repository/music.GetAll: %w", err)
+	}
+
+	return music, nil
+}
+
+func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error) {
+	music, err := m.repo.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("/repository/music.GetAll: %w", err)
 	}
 
 	return music, nil
@@ -28,7 +38,7 @@ func (m *musicInteractor) GetAll(ctx context.Context) ([]entity.MusicShow, error
 func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
 	err := m.repo.Create(ctx, musicCreate)
 	if err != nil {
-		return err
+		return fmt.Errorf("/repository/music.Create: %w", err)
 	}
 
 	return nil
@@ -37,7 +47,7 @@ func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicC
 func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	err := m.repo.Update(ctx, musicUpdate)
 	if err != nil {
-		return err
+		return fmt.Errorf("/repository/music.Update: %w", err)
 	}
 
 	return nil
@@ -46,7 +56,7 @@ func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicD
 func (m *musicInteractor) Delete(ctx context.Context, id *entity.MusicID) error {
 	err := m.repo.Delete(ctx, id)
 	if err != nil {
-		return err
+		return fmt.Errorf("/repository/music.Delete: %w", err)
 	}
 
 	return nil

@@ -26,7 +26,18 @@ func (m *musicHandlers) GetAll(c *gin.Context) {
 	ctx := context.Background()
 	music, err := m.interactor.GetAll(ctx)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAll: %w", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, music)
+}
+
+func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
+	ctx := context.Background()
+	music, err := m.interactor.GetAll(ctx)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAllSortByTime: %w", err))
 		return
 	}
 
@@ -51,7 +62,7 @@ func (m *musicHandlers) Create(c *gin.Context) {
 
 	err = m.interactor.Create(ctx, &music)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't create music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Create: %w", err))
 	}
 
 	c.JSON(http.StatusOK, nil)
@@ -81,7 +92,7 @@ func (m *musicHandlers) Update(c *gin.Context) {
 
 	err = m.interactor.Update(ctx, &music)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't update music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Update: %w", err))
 	}
 
 	c.JSON(http.StatusOK, nil)
@@ -100,7 +111,7 @@ func (m *musicHandlers) Delete(c *gin.Context) {
 
 	err = m.interactor.Delete(ctx, &musicId)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Delete: %w", err))
 	}
 
 	c.JSON(http.StatusOK, nil)

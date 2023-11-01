@@ -299,9 +299,10 @@ func (h *userHandlers) DeleteHandler(c *gin.Context) {
 
 func (h *userHandlers) LikeTrack(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse token: %w", err))
+
+	id, exists := c.Get("user-id")
+	if !exists {
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -318,9 +319,9 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 		return
 	}
 
-	err = h.interactor.LikeTrack(ctx, userId, trackId)
+	err = h.interactor.LikeTrack(ctx, id.(*entity.UserID), trackId)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't like track: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.LikeTrack: %w", err))
 		return
 	}
 
@@ -329,9 +330,10 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 
 func (h *userHandlers) DislikeTrack(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse token: %w", err))
+
+	id, exists := c.Get("user-id")
+	if !exists {
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -348,9 +350,9 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 		return
 	}
 
-	err = h.interactor.DislikeTrack(ctx, userId, trackId)
+	err = h.interactor.DislikeTrack(ctx, id.(*entity.UserID), trackId)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't dislike track: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.DislikeTrack: %w", err))
 		return
 	}
 
@@ -359,14 +361,16 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 
 func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
 	ctx := context.Background()
-	userId, err := entity.ParseToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse token: %w", err))
+
+	id, exists := c.Get("user-id")
+	if !exists {
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	data, err := h.interactor.ShowLikedTracks(ctx, userId)
+
+	data, err := h.interactor.ShowLikedTracks(ctx, id.(*entity.UserID))
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get users tracks: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.ShowLikedTracks: %w", err))
 		return
 	}
 
