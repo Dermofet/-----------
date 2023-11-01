@@ -54,11 +54,14 @@ func (m *musicSource) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicD
 
 	var data []*entity.MusicDB
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.MusicDB
-		rows.StructScan(&scanEntity)
-		fmt.Println(scanEntity)
-		data = append(data, &scanEntity)
+		var scanEntity entity.MusicShow
+		err := rows.StructScan(&scanEntity)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, scanEntity)
 	}
+
 	return data, nil
 }
 
@@ -71,6 +74,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }
 
@@ -81,6 +85,7 @@ func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) e
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }
 
@@ -91,5 +96,6 @@ func (m *musicSource) Delete(ctx context.Context, id *entity.MusicID) error {
 	if row.Err() != nil {
 		return row.Err()
 	}
+
 	return nil
 }

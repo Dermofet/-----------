@@ -42,49 +42,26 @@ func (m *musicHandlers) GetAll(c *gin.Context) {
 	ctx := context.Background()
 	musics, err := m.interactor.GetAll(ctx)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAll: %w", err))
+		return
 	}
-	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics)) //Проверить вывод
+
+	c.JSON(http.StatusOK, music)
 }
 
-// GetAndSortByPopularHandler godoc
-// @Summary Получение треков отсортированных по популярности
-// @Description Получение треков отсортированных по популярности
-// @Tags Music
-// @Accept json
-// @Produce plain
-// @Security JwtAuth
-// @Success 200 {object} []view.MusicView "Список треков"
-// @Failure 400 "Некорректный запрос"
-// @Failure 401 "Неавторизованный запрос"
-// @Failure 404 "Пользователь не найден"
-// @Failure 500 "Внутренняя ошибка сервера"
-// @Router /music/catalog/popular [get]
-func (m *musicHandlers) GetAndSortByPopular(c *gin.Context) {
+func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 	ctx := context.Background()
-	musics, err := m.interactor.GetAndSortByPopular(ctx)
+	music, err := m.interactor.GetAll(ctx)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAllSortByTime: %w", err))
+		return
 	}
-	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics))
+	c.JSON(http.StatusOK, music) //Проверить вывод
 }
 
-// CreateHandler godoc
-// @Summary Создание трека
-// @Description Создание нового трека
-// @Tags Music
-// @Accept json
-// @Produce plain
-// @Security JwtAuth
-// @Param request body entity.MusicCreate true "Данные трека"
-// @Success 201 "Трек создан"
-// @Failure 400 "Некорректный запрос"
-// @Failure 401 "Неавторизованный запрос"
-// @Failure 404 "Пользователь не найден"
-// @Failure 500 "Внутренняя ошибка сервера"
-// @Router /music/new [post]
 func (m *musicHandlers) Create(c *gin.Context) {
 	ctx := context.Background()
+
 	body, err := c.GetRawData()
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
@@ -97,9 +74,10 @@ func (m *musicHandlers) Create(c *gin.Context) {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
 		return
 	}
+
 	err = m.interactor.Create(ctx, &music)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't create music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Create: %w", err))
 	}
 	c.JSON(http.StatusCreated, nil)
 }
@@ -120,6 +98,7 @@ func (m *musicHandlers) Create(c *gin.Context) {
 // @Router /music/{id} [put]
 func (m *musicHandlers) Update(c *gin.Context) {
 	ctx := context.Background()
+
 	body, err := c.GetRawData()
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
@@ -129,7 +108,7 @@ func (m *musicHandlers) Update(c *gin.Context) {
 	var music entity.MusicDB
 	music.Id, err = uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't get id: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
 	}
 
@@ -141,8 +120,9 @@ func (m *musicHandlers) Update(c *gin.Context) {
 
 	err = m.interactor.Update(ctx, &music)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't update music: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Update: %w", err))
 	}
+
 	c.JSON(http.StatusOK, nil)
 }
 
@@ -167,12 +147,14 @@ func (m *musicHandlers) Delete(c *gin.Context) {
 	var err error
 	musicId.Id, err = uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
 	}
+
 	err = m.interactor.Delete(ctx, &musicId)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Delete: %w", err))
 	}
+
 	c.JSON(http.StatusOK, nil)
 }

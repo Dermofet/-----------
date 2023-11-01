@@ -143,9 +143,12 @@ func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([
 	}
 
 	for i := 0; rows.Next(); i++ {
-		var scanEntity entity.Music
-		rows.Scan(&scanEntity.Name)
-		data = append(data, &scanEntity)
+		var scanEntity entity.MusicShow
+		err := rows.StructScan(&scanEntity)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, scanEntity)
 	}
 
 	return data, nil

@@ -157,6 +157,7 @@ func (r *router) registerRoutes() error {
 		musicGroup.Use(middlewares.NewAuthMiddleware())
 
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
+		musicGroup.GET("/release", r.handlers.musicHandlers.GetAllSortByTime)
 		musicGroup.GET("/catalog/popular", r.handlers.musicHandlers.GetAndSortByPopular)
 		musicGroup.POST(
 			"/new",

@@ -20,6 +20,7 @@ type UserRepository interface {
 type MusicRepository interface {
 	GetAll(ctx context.Context) ([]*entity.Music, error)
 	GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error)
+	GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error)
 	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
 	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error

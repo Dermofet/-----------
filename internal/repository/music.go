@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"fmt"
 	"music-backend-test/internal/db"
 	"music-backend-test/internal/entity"
 )
@@ -36,7 +37,16 @@ func (m *musicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
 func (m *musicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
 	musicsDB, err := m.source.GetAndSortByPopular(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from db: %w", err)
+		return nil, fmt.Errorf("can't get musics from db: %w", fmt.Errorf("/db/music.GetAll: %w", err)
+	}
+
+	return music, nil
+}
+
+func (m *musicRepository) GetAllSortByTime(ctx context.Context) ([]entity.MusicShow, error) {
+	music, err := m.source.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("/db/music.GetAll: %w", err))
 	}
 
 	musics := make([]*entity.Music, len(musicsDB))
@@ -54,6 +64,7 @@ func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicC
 	if err != nil {
 		return fmt.Errorf("can't create music in db: %w", err)
 	}
+
 	return nil
 }
 
@@ -62,6 +73,7 @@ func (m *musicRepository) Update(ctx context.Context, musicUpdate *entity.MusicD
 	if err != nil {
 		return fmt.Errorf("can't update music in db: %w", err)
 	}
+
 	return nil
 }
 
@@ -70,5 +82,6 @@ func (m *musicRepository) Delete(ctx context.Context, id *entity.MusicID) error 
 	if err != nil {
 		return fmt.Errorf("can't delete music in db: %w", err)
 	}
+
 	return nil
 }

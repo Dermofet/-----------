@@ -109,7 +109,7 @@ func (u *userRepository) Delete(ctx context.Context, id *entity.UserID) error {
 func (u *userRepository) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
 	err := u.source.LikeTrack(ctx, userId, trackId)
 	if err != nil {
-		return fmt.Errorf("can't get track from db: %w", err)
+		return fmt.Errorf("/db/user.LikeTrack: %w", err)
 	}
 
 	return nil
@@ -118,7 +118,7 @@ func (u *userRepository) LikeTrack(ctx context.Context, userId *entity.UserID, t
 func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
 	err := u.source.DislikeTrack(ctx, userId, trackId)
 	if err != nil {
-		return fmt.Errorf("can't drop track from db: %w", err)
+		return fmt.Errorf("/db/user.DislikeTrack: %w", err)
 	}
 
 	return nil
@@ -127,7 +127,7 @@ func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID
 func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
 	data, err := u.source.ShowLikedTracks(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("can't get users tracks from db: %w", err)
+		return nil, fmt.Errorf("/db/user.ShowLikedTracks: %w", err)
 	}
 
 	return data, nil
