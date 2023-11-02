@@ -6,7 +6,6 @@ import (
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
 	"net/http"
-	"slices"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,13 +26,20 @@ func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteracto
 			return
 		}
 
-		fmt.Println(user.Role)
-		fmt.Println(roles)
-		if !slices.Contains(roles, user.Role) {
+		if !contains(roles, user.Role) {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
 
 		c.Next()
 	}
+}
+
+func contains(s []string, v string) bool {
+	for _, s_ := range s {
+		if v == s_ {
+			return true
+		}
+	}
+	return false
 }

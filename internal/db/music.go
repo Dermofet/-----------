@@ -93,7 +93,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 	defer dbCancel()
 
 	newuuid := uuid.New()
-	row := m.db.QueryRowxContext(dbCtx, "INSERT INTO music (id, name) VALUES ($1, $2)", newuuid, musicCreate.Name)
+	row := m.db.QueryRowxContext(dbCtx, "INSERT INTO music (id, name, release_date) VALUES ($1, $2, $3)", newuuid, musicCreate.Name, musicCreate.Release.Time)
 	if row.Err() != nil {
 		return row.Err()
 	}
@@ -104,7 +104,7 @@ func (m *musicSource) Create(ctx context.Context, musicCreate *entity.MusicCreat
 func (m *musicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	row := m.db.QueryRowxContext(dbCtx, "UPDATE music SET name = $1 WHERE id = $2", musicUpdate.Name, musicUpdate.Id)
+	row := m.db.QueryRowxContext(dbCtx, "UPDATE music SET name = $1, release_date = $3 WHERE id = $2", musicUpdate.Name, musicUpdate.Id, musicUpdate.Release.Time)
 	if row.Err() != nil {
 		return row.Err()
 	}

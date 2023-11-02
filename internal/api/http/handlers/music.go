@@ -66,7 +66,7 @@ func (m *musicHandlers) GetAndSortByPopular(c *gin.Context) {
 	ctx := context.Background()
 	musics, err := m.interactor.GetAndSortByPopular(ctx)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAndSortByPopular: %w", err))
 	}
 	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics))
 }

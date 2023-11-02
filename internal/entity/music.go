@@ -48,9 +48,9 @@ type Music struct {
 }
 
 type MusicDB struct {
-	Id      uuid.UUID `db:"id"`
-	Name    string    `db:"name"`
-	Release time.Time `db:"release_date"`
+	Id      uuid.UUID  `db:"id"`
+	Name    string     `db:"name"`
+	Release CustomDate `db:"release_date"`
 }
 
 type MusicCreate struct {

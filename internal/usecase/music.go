@@ -29,7 +29,7 @@ func (m *musicInteractor) GetAll(ctx context.Context) ([]*entity.Music, error) {
 func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
 	musics, err := m.repo.GetAllSortByTime(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from repository: %w", err)
+		return nil, fmt.Errorf("/repository/music.GetAllSortByTime: %w", err)
 	}
 	return musics, nil
 }
@@ -37,7 +37,7 @@ func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]*entity.Music
 func (m musicInteractor) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
 	musics, err := m.repo.GetAndSortByPopular(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from repository: %w", err)
+		return nil, fmt.Errorf("/repository/music.GetAndSortByPopular: %w", err)
 	}
 	return musics, nil
 }
@@ -45,7 +45,7 @@ func (m musicInteractor) GetAndSortByPopular(ctx context.Context) ([]*entity.Mus
 func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
 	err := m.repo.Create(ctx, musicCreate)
 	if err != nil {
-		return fmt.Errorf("can't create music in repository: %w", err)
+		return fmt.Errorf("/repository/music.Create: %w", err)
 	}
 
 	return nil
@@ -54,7 +54,7 @@ func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicC
 func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	err := m.repo.Update(ctx, musicUpdate)
 	if err != nil {
-		return fmt.Errorf("can't update music in repository: %w", err)
+		return fmt.Errorf("/repository/music.Update: %w", err)
 	}
 
 	return nil
@@ -63,7 +63,7 @@ func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicD
 func (m *musicInteractor) Delete(ctx context.Context, id *entity.MusicID) error {
 	err := m.repo.Delete(ctx, id)
 	if err != nil {
-		return fmt.Errorf("can't delete music from repository: %w", err)
+		return fmt.Errorf("/repository/music.Delete: %w", err)
 	}
 
 	return nil

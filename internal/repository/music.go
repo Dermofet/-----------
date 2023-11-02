@@ -20,7 +20,7 @@ func NewMusicRepositiry(source db.MusicSource) *musicRepository {
 func (m *musicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
 	musicsDB, err := m.source.GetAll(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from db: %w", err)
+		return nil, fmt.Errorf("/db/music.GetAll: %w", err)
 	}
 
 	musics := make([]*entity.Music, len(musicsDB))
@@ -36,7 +36,7 @@ func (m *musicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
 func (m *musicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
 	musicsDB, err := m.source.GetAndSortByPopular(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("can't get musics from db: %w", err)
+		return nil, fmt.Errorf("/db/music.GetAndSortByPopular: %w", err)
 	}
 
 	musics := make([]*entity.Music, len(musicsDB))
@@ -68,7 +68,7 @@ func (m *musicRepository) GetAllSortByTime(ctx context.Context) ([]*entity.Music
 func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
 	err := m.source.Create(ctx, musicCreate)
 	if err != nil {
-		return fmt.Errorf("can't create music in db: %w", err)
+		return fmt.Errorf("/db/music.Create: %w", err)
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func (m *musicRepository) Create(ctx context.Context, musicCreate *entity.MusicC
 func (m *musicRepository) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
 	err := m.source.Update(ctx, musicUpdate)
 	if err != nil {
-		return fmt.Errorf("can't update music in db: %w", err)
+		return fmt.Errorf("/db/music.Update: %w", err)
 	}
 
 	return nil
@@ -86,7 +86,7 @@ func (m *musicRepository) Update(ctx context.Context, musicUpdate *entity.MusicD
 func (m *musicRepository) Delete(ctx context.Context, id *entity.MusicID) error {
 	err := m.source.Delete(ctx, id)
 	if err != nil {
-		return fmt.Errorf("can't delete music in db: %w", err)
+		return fmt.Errorf("/db/music.Delete: %w", err)
 	}
 
 	return nil
