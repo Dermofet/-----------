@@ -88,6 +88,50 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
   - user_id (uuid)
   - music_id (uuid)
 
+## Структура проекта
+
+  - cmd/ 
+    - music-backend-test/
+      - config/
+        - <span style="color: lightblue;">Файлы конфигураций</span>
+      - main.go
+  - dev/
+    - .env
+    - docker-compose.yml
+  - Dockerfile
+  - docs/
+    - <span style="color: lightblue;">Файлы документации Swagger</span>
+  - go.mod
+  - go.sum
+  - internal/
+    - api/
+      - http/
+        - handlers/
+          - <span style="color: lightblue;">Файлы обработчиков запросов</span>
+        - middlewares/
+          - <span style="color: lightblue;">Файлы middlewares</span>
+        - presenter/
+          - <span style="color: lightblue;">Файлы, для преобразования данных</span>
+        - router.go
+        - server.go
+        - view/
+          - <span style="color: lightblue;">Файлы представлений сущностей</span>
+    - app/
+      - app.go
+      - migrate.go
+      - migrations/
+        - <span style="color: lightblue;">Файлы миграций</span>
+    - db/
+      - <span style="color: lightblue;">Файлы для работы с базой данных</span>
+    - entity/
+      - <span style="color: lightblue;">Файлы сущностей</span>
+    - repository/
+      - <span style="color: lightblue;">Файлы репозиториев</span>
+    - usecase/
+      - <span style="color: lightblue;">Файлы сервисов</span>
+  - README.md
+  - run.sh
+
 ## API-документация
 
 Здесь вы найдете описание доступных API-эндпоинтов, их методов и параметров запросов. Для каждого эндпоинта предоставьте подробное описание.
