@@ -76,7 +76,7 @@ func (a *authHandlers) SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, token)
+	c.JSON(http.StatusCreated, token)
 }
 
 // SignIn godoc
