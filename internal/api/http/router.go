@@ -99,7 +99,7 @@ func (r *router) registerRoutes() error {
 	musicSource := db.NewMusicSource(pgSource)
 
 	userRepository := repository.NewUserRepository(userSource)
-	musicRepository := repository.NewMusicRepositiry(musicSource)
+	musicRepository := repository.NewMusicRepository(musicSource)
 
 	userInteractor := usecase.NewUserInteractor(userRepository)
 	musicInteractor := usecase.NewMusicInteractor(musicRepository)
@@ -157,6 +157,7 @@ func (r *router) registerRoutes() error {
 		musicGroup.Use(middlewares.NewAuthMiddleware())
 
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
+		musicGroup.GET("/:id", r.handlers.musicHandlers.Get)
 		musicGroup.GET("/release", r.handlers.musicHandlers.GetAllSortByTime)
 		musicGroup.GET("/popular", r.handlers.musicHandlers.GetAndSortByPopular)
 		musicGroup.POST(

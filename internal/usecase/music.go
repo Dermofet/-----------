@@ -26,6 +26,15 @@ func (m *musicInteractor) GetAll(ctx context.Context) ([]*entity.Music, error) {
 	return music, nil
 }
 
+func (m *musicInteractor) Get(ctx context.Context, musicId *entity.MusicID) (*entity.Music, error) {
+	music, err := m.repo.Get(ctx, musicId)
+	if err != nil {
+		return nil, fmt.Errorf("/repository/music.Get: %w", err)
+	}
+
+	return music, nil
+}
+
 func (m *musicInteractor) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
 	musics, err := m.repo.GetAllSortByTime(ctx)
 	if err != nil {
@@ -42,8 +51,8 @@ func (m musicInteractor) GetAndSortByPopular(ctx context.Context) ([]*entity.Mus
 	return musics, nil
 }
 
-func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
-	err := m.repo.Create(ctx, musicCreate)
+func (m *musicInteractor) Create(ctx context.Context, musicParse *entity.MusicParse) error {
+	err := m.repo.Create(ctx, musicParse)
 	if err != nil {
 		return fmt.Errorf("/repository/music.Create: %w", err)
 	}
@@ -51,8 +60,8 @@ func (m *musicInteractor) Create(ctx context.Context, musicCreate *entity.MusicC
 	return nil
 }
 
-func (m *musicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
-	err := m.repo.Update(ctx, musicUpdate)
+func (m *musicInteractor) Update(ctx context.Context, musicParse *entity.MusicParse) error {
+	err := m.repo.Update(ctx, musicParse)
 	if err != nil {
 		return fmt.Errorf("/repository/music.Update: %w", err)
 	}

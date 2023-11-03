@@ -19,9 +19,10 @@ type UserSource interface {
 
 type MusicSource interface {
 	GetAll(ctx context.Context) ([]*entity.MusicDB, error)
+	Get(ctx context.Context, musicId *entity.MusicID) (*entity.MusicDB, error)
 	GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error)
 	GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error)
-	Create(ctx context.Context, musicCreate *entity.MusicCreate) error
-	Update(ctx context.Context, musicUpdate *entity.MusicDB) error
+	Create(ctx context.Context, musicDb *entity.MusicDB) error
+	Update(ctx context.Context, musicDb *entity.MusicDB) error
 	Delete(ctx context.Context, id *entity.MusicID) error
 }

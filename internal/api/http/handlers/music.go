@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"music-backend-test/internal/api/http/presenter"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -43,6 +43,26 @@ func (m *musicHandlers) GetAll(c *gin.Context) {
 	musics, err := m.interactor.GetAll(ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAll: %w", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, musics)
+}
+
+func (m *musicHandlers) Get(c *gin.Context) {
+	ctx := context.Background()
+
+	var musicId entity.MusicID
+	var err error
+	musicId.Id, err = uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse id: %w", err))
+		return
+	}
+
+	musics, err := m.interactor.Get(ctx, &musicId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Get: %w", err))
 		return
 	}
 
@@ -111,18 +131,24 @@ func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 func (m *musicHandlers) Create(c *gin.Context) {
 	ctx := context.Background()
 
-	body, err := c.GetRawData()
+	var music entity.MusicParse
+	err := c.Request.ParseMultipartForm(64)
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read form data: %w", err))
 		return
 	}
-
-	var music entity.MusicCreate
-	err = json.Unmarshal(body, &music)
+	music.Name = c.Request.FormValue("name")
+	music.Release, err = time.Parse("2006-01-02", c.Request.FormValue("release"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read pars time: %w", err))
 		return
 	}
+	music.File, music.FileHeader, err = c.Request.FormFile("file")
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
+		return
+	}
+	// music.File.Close()
 
 	err = m.interactor.Create(ctx, &music)
 	if err != nil {
@@ -148,24 +174,31 @@ func (m *musicHandlers) Create(c *gin.Context) {
 func (m *musicHandlers) Update(c *gin.Context) {
 	ctx := context.Background()
 
-	body, err := c.GetRawData()
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
-		return
-	}
-
-	var music entity.MusicDB
+	var music entity.MusicParse
+	var err error
 	music.Id, err = uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
 	}
 
-	err = json.Unmarshal(body, &music)
+	err = c.Request.ParseMultipartForm(64)
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read form data: %w", err))
 		return
 	}
+	music.Name = c.Request.FormValue("name")
+	music.Release, err = time.Parse("2006-01-02", c.Request.FormValue("release"))
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read pars time: %w", err))
+		return
+	}
+	music.File, music.FileHeader, err = c.Request.FormFile("file")
+	if err != nil {
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
+		return
+	}
+	// music.File.Close()
 
 	err = m.interactor.Update(ctx, &music)
 	if err != nil {

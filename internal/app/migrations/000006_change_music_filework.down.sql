@@ -1,0 +1,2 @@
+ALTER TABLE music
+    DROP COLUMN IF EXISTS file_name

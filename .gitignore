@@ -44,4 +44,5 @@ go.work
 
 # End of https://www.toptal.com/developers/gitignore/api/git,go
 
-/dev/.env
+./dev/.env
+./internal/storage/music_storage
