@@ -1,37 +1,26 @@
 package entity
 
 import (
+	"fmt"
 	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type MusicID struct {
-	Id uuid.UUID `db:"id"`
-}
+// type Music struct {
+// 	Id       uuid.UUID
+// 	Name     string
+// 	Filename string
+// 	Release  time.Time
+// }
 
-func (m *MusicID) String() string {
-	return m.Id.String()
-}
-
-func (m *MusicID) FromString(s string) error {
-	var err error
-	m.Id, err = uuid.Parse(s)
-	return err
-}
-
-type Music struct {
-	Id   *MusicID
-	Name string
-}
-
+// swagger:ignore
 type MusicParse struct {
-	Id         uuid.UUID
 	Name       string
 	Release    time.Time
-	File       multipart.File
-	FileHeader *multipart.FileHeader
+	File       multipart.File        `swaggerignore:"true"`
+	FileHeader *multipart.FileHeader `swaggerignore:"true"`
 }
 
 type MusicCreate struct {
@@ -41,10 +30,16 @@ type MusicCreate struct {
 }
 
 type MusicDB struct {
-	Id       uuid.UUID `db:"id"`
-	Name     string    `db:"name"`
-	Release  time.Time `db:"release_date"`
-	FileName string    `db:"file_name"`
+	Id       uuid.UUID `db:"id"`           // id трека
+	Name     string    `db:"name"`         // название трека
+	Release  time.Time `db:"release_date"` // дата релиза трека
+	FileName string    `db:"file_name"`    // имя файла
+	Size     uint64    `db:"size"`         // размер файла
+	Duration string    `db:"duration"`     // продолжительность трека
+}
+
+func (m *MusicDB) FilePath() string {
+	return fmt.Sprintf("./internal/storage/music_storage/%s", m.FileName)
 }
 
 // type CustomDate struct {

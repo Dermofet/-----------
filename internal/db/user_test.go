@@ -110,7 +110,7 @@ func Test_source_CreateUser(t *testing.T) {
 				t.Errorf("source.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != nil {
+			if got != uuid.Nil {
 				_, err = uuid.Parse(got.String())
 				if err != nil {
 					t.Errorf("source.CreateUser() = %v, want uuid", got)
@@ -126,7 +126,7 @@ func Test_source_GetUserById(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
@@ -139,9 +139,7 @@ func Test_source_GetUserById(t *testing.T) {
 			name: "success: GetUserById source: user found",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: &entity.UserDB{
 				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
@@ -168,9 +166,7 @@ func Test_source_GetUserById(t *testing.T) {
 			name: "success: GetUserById source: can't find user",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -182,9 +178,7 @@ func Test_source_GetUserById(t *testing.T) {
 			name: "error: GetUserById source: can't exec query",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -196,9 +190,7 @@ func Test_source_GetUserById(t *testing.T) {
 			name: "error: GetUserById source: can't scan user",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -489,7 +481,7 @@ func Test_source_DeleteUser(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
@@ -502,9 +494,7 @@ func Test_source_DeleteUser(t *testing.T) {
 			name: "success: Delete source: user deleted",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -530,9 +520,7 @@ func Test_source_DeleteUser(t *testing.T) {
 			name: "error: DeleteUser source: can't exec query",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 )
 
 type Token struct {
@@ -25,7 +26,7 @@ func (t *Token) String() (string, error) {
 	return t.Token.SignedString([]byte(cfg.ApiKey))
 }
 
-func GenerateToken(id *UserID) *Token {
+func GenerateToken(id uuid.UUID) *Token {
 	return &Token{
 		Token: jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 			Id:        id.String(),
@@ -36,29 +37,28 @@ func GenerateToken(id *UserID) *Token {
 	}
 }
 
-func ParseToken(tokenString string) (*UserID, error) {
+func ParseToken(tokenString string) (uuid.UUID, error) {
 	cfg, err := config.GetAppConfig()
 	if err != nil {
-		return nil, err
+		return uuid.Nil, err
 	}
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(cfg.ApiKey), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("invalid token: %v", err)
+		return uuid.Nil, fmt.Errorf("invalid token: %v", err)
 	}
 
 	claims, ok := token.Claims.(*jwt.StandardClaims)
 	if !ok || !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+		return uuid.Nil, fmt.Errorf("invalid token")
 	}
 
-	var id UserID
-	err = id.FromString(claims.Id)
+	id, err := uuid.Parse(claims.Id)
 	if err != nil {
-		return nil, err
+		return uuid.Nil, err
 	}
 
-	return &id, nil
+	return id, nil
 }

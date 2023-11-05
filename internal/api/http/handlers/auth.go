@@ -15,10 +15,10 @@ import (
 
 type authHandlers struct {
 	interactor usecase.UserInteractor
-	presenter  presenter.TokenPresenter
+	presenter  presenter.Presenter
 }
 
-func NewAuthHandlers(interactor usecase.UserInteractor, presenter presenter.TokenPresenter) *authHandlers {
+func NewAuthHandlers(interactor usecase.UserInteractor, presenter presenter.Presenter) *authHandlers {
 	return &authHandlers{
 		interactor: interactor,
 		presenter:  presenter,

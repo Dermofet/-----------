@@ -5,15 +5,10 @@ import (
 	"music-backend-test/internal/entity"
 )
 
-type UserPresenter interface {
-	ToUserView(user *entity.User) *view.UserView
-}
-
-type TokenPresenter interface {
+type Presenter interface {
+	ToUserView(user *entity.UserDB) *view.UserView
+	ToListUserView(users []*entity.UserDB) []*view.UserView
+	ToMusicView(*entity.MusicDB) *view.MusicView
+	ToListMusicView([]*entity.MusicDB) []*view.MusicView
 	ToTokenView(token *entity.Token) (*view.TokenView, error)
-}
-
-type MusicPresenter interface {
-	ToMusicView(*entity.Music) *view.MusicView
-	ToListMusicView([]*entity.Music) []*view.MusicView
 }

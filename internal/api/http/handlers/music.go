@@ -15,10 +15,10 @@ import (
 
 type musicHandlers struct {
 	interactor usecase.MusicInteractor
-	presenter  presenter.MusicPresenter
+	presenter  presenter.Presenter
 }
 
-func NewMusicHandlers(interactor usecase.MusicInteractor, presenter presenter.MusicPresenter) *musicHandlers {
+func NewMusicHandlers(interactor usecase.MusicInteractor, presenter presenter.Presenter) *musicHandlers {
 	return &musicHandlers{
 		interactor: interactor,
 		presenter:  presenter,
@@ -46,27 +46,7 @@ func (m *musicHandlers) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, musics)
-}
-
-func (m *musicHandlers) Get(c *gin.Context) {
-	ctx := context.Background()
-
-	var musicId entity.MusicID
-	var err error
-	musicId.Id, err = uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse id: %w", err))
-		return
-	}
-
-	musics, err := m.interactor.Get(ctx, &musicId)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Get: %w", err))
-		return
-	}
-
-	c.JSON(http.StatusOK, musics)
+	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics))
 }
 
 // GetAndSortByPopularHandler godoc
@@ -114,6 +94,38 @@ func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics)) //Проверить вывод
 }
 
+// GetFileHandler godoc
+// @Summary Скачивание файла трека
+// @Description Скачивание файла трека по id трека
+// @Tags Music
+// @Produce json
+// @Param id path string true "id трека"
+// @Security JwtAuth
+// @Success 200 {object} view.MusicView "Данные трека"
+// @Success 200 {file} file "Файл трека"
+// @Failure 400 "Некорректный запрос"
+// @Failure 401 "Неавторизованный запрос"
+// @Failure 404 "Пользователь не найден"
+// @Failure 500 "Внутренняя ошибка сервера"
+// @Router /music/download/{id} [get]
+func (m *musicHandlers) Get(c *gin.Context) {
+	ctx := context.Background()
+
+	musicId, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse id: %w", err))
+		return
+	}
+
+	music, err := m.interactor.Get(ctx, musicId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Get: %w", err))
+		return
+	}
+
+	c.FileAttachment(music.FilePath(), music.FileName)
+}
+
 // CreateHandler godoc
 // @Summary Создание трека
 // @Description Создание нового трека
@@ -121,7 +133,8 @@ func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 // @Accept json
 // @Produce plain
 // @Security JwtAuth
-// @Param request body entity.MusicCreate true "Данные трека"
+// @Param request formData entity.MusicParse true "Данные трека"
+// @Param file formData file true "Файл трека"
 // @Success 201 "Трек создан"
 // @Failure 400 "Некорректный запрос"
 // @Failure 401 "Неавторизованный запрос"
@@ -137,18 +150,19 @@ func (m *musicHandlers) Create(c *gin.Context) {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read form data: %w", err))
 		return
 	}
+
 	music.Name = c.Request.FormValue("name")
 	music.Release, err = time.Parse("2006-01-02", c.Request.FormValue("release"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read pars time: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read parse time: %w", err))
 		return
 	}
+
 	music.File, music.FileHeader, err = c.Request.FormFile("file")
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
 		return
 	}
-	// music.File.Close()
 
 	err = m.interactor.Create(ctx, &music)
 	if err != nil {
@@ -164,7 +178,9 @@ func (m *musicHandlers) Create(c *gin.Context) {
 // @Accept json
 // @Produce plain
 // @Security JwtAuth
-// @Param request body entity.MusicCreate true "Данные трека"
+// @Param id path string true "id трека"
+// @Param request formData entity.MusicParse true "Данные трека"
+// @Param file formData file false "Файл трека"
 // @Success 200 "Трек обновлен"
 // @Failure 400 "Некорректный запрос"
 // @Failure 401 "Неавторизованный запрос"
@@ -176,7 +192,7 @@ func (m *musicHandlers) Update(c *gin.Context) {
 
 	var music entity.MusicParse
 	var err error
-	music.Id, err = uuid.Parse(c.Param("id"))
+	musicId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
@@ -187,20 +203,21 @@ func (m *musicHandlers) Update(c *gin.Context) {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read form data: %w", err))
 		return
 	}
+
 	music.Name = c.Request.FormValue("name")
 	music.Release, err = time.Parse("2006-01-02", c.Request.FormValue("release"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read pars time: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read parse time: %w", err))
 		return
 	}
+
 	music.File, music.FileHeader, err = c.Request.FormFile("file")
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
 		return
 	}
-	// music.File.Close()
 
-	err = m.interactor.Update(ctx, &music)
+	err = m.interactor.Update(ctx, musicId, &music)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Update: %w", err))
 	}
@@ -225,15 +242,13 @@ func (m *musicHandlers) Update(c *gin.Context) {
 func (m *musicHandlers) Delete(c *gin.Context) {
 	ctx := context.Background()
 
-	var musicId entity.MusicID
-	var err error
-	musicId.Id, err = uuid.Parse(c.Param("id"))
+	musicId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
 	}
 
-	err = m.interactor.Delete(ctx, &musicId)
+	err = m.interactor.Delete(ctx, musicId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.Delete: %w", err))
 	}

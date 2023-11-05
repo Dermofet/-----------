@@ -16,10 +16,10 @@ import (
 
 type userHandlers struct {
 	interactor usecase.UserInteractor
-	presenter  presenter.UserPresenter
+	presenter  presenter.Presenter
 }
 
-func NewUserHandlers(interactor usecase.UserInteractor, presenter presenter.UserPresenter) *userHandlers {
+func NewUserHandlers(interactor usecase.UserInteractor, presenter presenter.Presenter) *userHandlers {
 	return &userHandlers{
 		interactor: interactor,
 		presenter:  presenter,
@@ -42,13 +42,13 @@ func NewUserHandlers(interactor usecase.UserInteractor, presenter presenter.User
 func (h *userHandlers) GetMeHandler(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	user, err := h.interactor.GetById(ctx, id.(*entity.UserID))
+	user, err := h.interactor.GetById(ctx, userId.(uuid.UUID))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
 		return
@@ -80,7 +80,7 @@ func (h *userHandlers) GetMeHandler(c *gin.Context) {
 func (h *userHandlers) UpdateMeHandler(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -99,7 +99,7 @@ func (h *userHandlers) UpdateMeHandler(c *gin.Context) {
 		return
 	}
 
-	dbUser, err := h.interactor.Update(ctx, id.(*entity.UserID), &user)
+	dbUser, err := h.interactor.Update(ctx, userId.(uuid.UUID), &user)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't update user: %w", err))
 		return
@@ -129,13 +129,13 @@ func (h *userHandlers) UpdateMeHandler(c *gin.Context) {
 func (h *userHandlers) DeleteMeHandler(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	err := h.interactor.Delete(ctx, id.(*entity.UserID))
+	err := h.interactor.Delete(ctx, userId.(uuid.UUID))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.AbortWithStatus(http.StatusNotFound)
@@ -171,7 +171,7 @@ func (h *userHandlers) GetByIdHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := h.interactor.GetById(ctx, &entity.UserID{Id: id})
+	user, err := h.interactor.GetById(ctx, id)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
 		return
@@ -255,7 +255,7 @@ func (h *userHandlers) UpdateHandler(c *gin.Context) {
 		return
 	}
 
-	dbUser, err := h.interactor.Update(ctx, &entity.UserID{Id: id}, &user)
+	dbUser, err := h.interactor.Update(ctx, id, &user)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't update user: %w", err))
 		return
@@ -287,7 +287,7 @@ func (h *userHandlers) DeleteHandler(c *gin.Context) {
 		return
 	}
 
-	err = h.interactor.Delete(ctx, &entity.UserID{Id: id})
+	err = h.interactor.Delete(ctx, id)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't delete user: %w", err))
 		return
@@ -313,33 +313,23 @@ func (h *userHandlers) DeleteHandler(c *gin.Context) {
 func (h *userHandlers) LikeTrack(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	body, err := c.GetRawData()
+	// TODO
+	// Изменил твой код
+	// Ты передавал id в body запроса
+	// Теперь он передается в path
+	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	var trackId *entity.MusicID
-	err = json.Unmarshal(body, &trackId)
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
-		return
-	}
-
-	userId := &entity.UserID{}
-	err = userId.FromString(id.(string))
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("invalid id: %w", err))
-		return
-	}
-
-	err = h.interactor.LikeTrack(ctx, userId, trackId)
+	err = h.interactor.LikeTrack(ctx, userId.(uuid.UUID), trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.LikeTrack: %w", err))
 		return
@@ -365,33 +355,23 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 func (h *userHandlers) DislikeTrack(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	body, err := c.GetRawData()
+	// TODO
+	// Изменил твой код
+	// Ты передавал id в body запроса
+	// Теперь он передается в path
+	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read body: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	var trackId *entity.MusicID
-	err = json.Unmarshal(body, &trackId)
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't unmarshal body: %w", err))
-		return
-	}
-
-	userId := &entity.UserID{}
-	err = userId.FromString(id.(string))
-	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("invalid id: %w", err))
-		return
-	}
-
-	err = h.interactor.DislikeTrack(ctx, userId, trackId)
+	err = h.interactor.DislikeTrack(ctx, userId.(uuid.UUID), trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.DislikeTrack: %w", err))
 		return
@@ -407,7 +387,7 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 // @Accept json
 // @Produce plain
 // @Security JwtAuth
-// @Success 200 {object} view.ListMusicView
+// @Success 200 {object} []view.MusicView "Список понравившихся треков"
 // @Failure 400 "Некорректный запрос"
 // @Failure 401 "Неавторизованный запрос"
 // @Failure 404 "Трек не найден"
@@ -422,11 +402,11 @@ func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
 		return
 	}
 
-	data, err := h.interactor.ShowLikedTracks(ctx, id.(*entity.UserID))
+	data, err := h.interactor.ShowLikedTracks(ctx, id.(uuid.UUID))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.ShowLikedTracks: %w", err))
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusOK, h.presenter.ToListMusicView(data))
 }

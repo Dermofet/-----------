@@ -1,16 +1,4 @@
 definitions:
-  entity.CustomDate:
-    properties:
-      time.Time:
-        type: string
-    type: object
-  entity.MusicCreate:
-    properties:
-      name:
-        type: string
-      release:
-        $ref: '#/definitions/entity.CustomDate'
-    type: object
   entity.UserCreate:
     properties:
       password:
@@ -20,18 +8,19 @@ definitions:
         description: Имя пользователя
         type: string
     type: object
-  view.ListMusicView:
-    properties:
-      musics:
-        items:
-          $ref: '#/definitions/view.MusicView'
-        type: array
-    type: object
   view.MusicView:
     properties:
+      duration:
+        description: продолжительность трека
+        type: string
       id:
+        description: id трека
         type: string
       name:
+        description: название трека
+        type: string
+      size:
+        description: размер файла трека (в удобном для чтения виде)
         type: string
     type: object
   view.TokenView:
@@ -150,12 +139,21 @@ paths:
       - application/json
       description: Обновление трека
       parameters:
-      - description: Данные трека
-        in: body
-        name: request
+      - description: id трека
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/entity.MusicCreate'
+        type: string
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: release
+        type: string
+      - description: Файл трека
+        in: formData
+        name: file
+        type: file
       produces:
       - text/plain
       responses:
@@ -201,18 +199,52 @@ paths:
       summary: Получение всех треков
       tags:
       - Music
+  /music/download/{id}:
+    get:
+      description: Скачивание файла трека по id трека
+      parameters:
+      - description: id трека
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Файл трека
+          schema:
+            type: file
+        "400":
+          description: Некорректный запрос
+        "401":
+          description: Неавторизованный запрос
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - JwtAuth: []
+      summary: Скачивание файла трека
+      tags:
+      - Music
   /music/new:
     post:
       consumes:
       - application/json
       description: Создание нового трека
       parameters:
-      - description: Данные трека
-        in: body
-        name: request
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: release
+        type: string
+      - description: Файл трека
+        in: formData
+        name: file
         required: true
-        schema:
-          $ref: '#/definitions/entity.MusicCreate'
+        type: file
       produces:
       - text/plain
       responses:
@@ -390,9 +422,11 @@ paths:
       - text/plain
       responses:
         "200":
-          description: OK
+          description: Список понравившихся треков
           schema:
-            $ref: '#/definitions/view.ListMusicView'
+            items:
+              $ref: '#/definitions/view.MusicView'
+            type: array
         "400":
           description: Некорректный запрос
         "401":

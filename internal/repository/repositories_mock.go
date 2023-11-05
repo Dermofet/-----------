@@ -10,6 +10,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockUserRepository is a mock of UserRepository interface.
@@ -36,10 +37,10 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockUserRepository) Create(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+func (m *MockUserRepository) Create(ctx context.Context, user *entity.UserCreate) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, user)
-	ret0, _ := ret[0].(*entity.UserID)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,7 +52,7 @@ func (mr *MockUserRepositoryMockRecorder) Create(ctx, user interface{}) *gomock.
 }
 
 // Delete mocks base method.
-func (m *MockUserRepository) Delete(ctx context.Context, id *entity.UserID) error {
+func (m *MockUserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -65,7 +66,7 @@ func (mr *MockUserRepositoryMockRecorder) Delete(ctx, id interface{}) *gomock.Ca
 }
 
 // DislikeTrack mocks base method.
-func (m *MockUserRepository) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserRepository) DislikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DislikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -79,10 +80,10 @@ func (mr *MockUserRepositoryMockRecorder) DislikeTrack(ctx, userId, trackId inte
 }
 
 // GetById mocks base method.
-func (m *MockUserRepository) GetById(ctx context.Context, id *entity.UserID) (*entity.User, error) {
+func (m *MockUserRepository) GetById(ctx context.Context, id uuid.UUID) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", ctx, id)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,10 +95,10 @@ func (mr *MockUserRepositoryMockRecorder) GetById(ctx, id interface{}) *gomock.C
 }
 
 // GetByUsername mocks base method.
-func (m *MockUserRepository) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
+func (m *MockUserRepository) GetByUsername(ctx context.Context, username string) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -109,7 +110,7 @@ func (mr *MockUserRepositoryMockRecorder) GetByUsername(ctx, username interface{
 }
 
 // LikeTrack mocks base method.
-func (m *MockUserRepository) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserRepository) LikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -123,10 +124,10 @@ func (mr *MockUserRepositoryMockRecorder) LikeTrack(ctx, userId, trackId interfa
 }
 
 // ShowLikedTracks mocks base method.
-func (m *MockUserRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
+func (m *MockUserRepository) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ShowLikedTracks", ctx, id)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -138,10 +139,10 @@ func (mr *MockUserRepositoryMockRecorder) ShowLikedTracks(ctx, id interface{}) *
 }
 
 // Update mocks base method.
-func (m *MockUserRepository) Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error) {
+func (m *MockUserRepository) Update(ctx context.Context, id uuid.UUID, user *entity.UserCreate) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, id, user)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -176,7 +177,7 @@ func (m *MockMusicRepository) EXPECT() *MockMusicRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockMusicRepository) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
+func (m *MockMusicRepository) Create(ctx context.Context, musicCreate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, musicCreate)
 	ret0, _ := ret[0].(error)
@@ -190,7 +191,7 @@ func (mr *MockMusicRepositoryMockRecorder) Create(ctx, musicCreate interface{}) 
 }
 
 // Delete mocks base method.
-func (m *MockMusicRepository) Delete(ctx context.Context, id *entity.MusicID) error {
+func (m *MockMusicRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -203,11 +204,26 @@ func (mr *MockMusicRepositoryMockRecorder) Delete(ctx, id interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockMusicRepository)(nil).Delete), ctx, id)
 }
 
+// Get mocks base method.
+func (m *MockMusicRepository) Get(ctx context.Context, musicId uuid.UUID) (*entity.MusicDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, musicId)
+	ret0, _ := ret[0].(*entity.MusicDB)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockMusicRepositoryMockRecorder) Get(ctx, musicId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMusicRepository)(nil).Get), ctx, musicId)
+}
+
 // GetAll mocks base method.
-func (m *MockMusicRepository) GetAll(ctx context.Context) ([]*entity.Music, error) {
+func (m *MockMusicRepository) GetAll(ctx context.Context) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -219,10 +235,10 @@ func (mr *MockMusicRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call 
 }
 
 // GetAllSortByTime mocks base method.
-func (m *MockMusicRepository) GetAllSortByTime(ctx context.Context) ([]*entity.Music, error) {
+func (m *MockMusicRepository) GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllSortByTime", ctx)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -234,10 +250,10 @@ func (mr *MockMusicRepositoryMockRecorder) GetAllSortByTime(ctx interface{}) *go
 }
 
 // GetAndSortByPopular mocks base method.
-func (m *MockMusicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.Music, error) {
+func (m *MockMusicRepository) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAndSortByPopular", ctx)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -249,7 +265,7 @@ func (mr *MockMusicRepositoryMockRecorder) GetAndSortByPopular(ctx interface{}) 
 }
 
 // Update mocks base method.
-func (m *MockMusicRepository) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
+func (m *MockMusicRepository) Update(ctx context.Context, musicUpdate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
 	ret0, _ := ret[0].(error)

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"music-backend-test/internal/db"
 	"music-backend-test/internal/entity"
+
+	"github.com/google/uuid"
 )
 
 type userRepository struct {
@@ -18,16 +20,16 @@ func NewUserRepository(source db.UserSource) *userRepository {
 	}
 }
 
-func (u *userRepository) Create(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+func (u *userRepository) Create(ctx context.Context, user *entity.UserCreate) (uuid.UUID, error) {
 	userId, err := u.source.CreateUser(ctx, user)
 	if err != nil {
-		return nil, fmt.Errorf("can't create user: %w", err)
+		return uuid.Nil, fmt.Errorf("can't create user: %w", err)
 	}
 
 	return userId, nil
 }
 
-func (u *userRepository) GetById(ctx context.Context, id *entity.UserID) (*entity.User, error) {
+func (u *userRepository) GetById(ctx context.Context, id uuid.UUID) (*entity.UserDB, error) {
 	user, err := u.source.GetUserById(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -36,17 +38,10 @@ func (u *userRepository) GetById(ctx context.Context, id *entity.UserID) (*entit
 		return nil, fmt.Errorf("GetByUsername: can't get user by id from db: %w", err)
 	}
 
-	return &entity.User{
-		ID: &entity.UserID{
-			Id: user.ID,
-		},
-		Username: user.Username,
-		Password: user.Password,
-		Role:     user.Role,
-	}, nil
+	return user, nil
 }
 
-func (u *userRepository) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
+func (u *userRepository) GetByUsername(ctx context.Context, username string) (*entity.UserDB, error) {
 	user, err := u.source.GetUserByUsername(ctx, username)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -55,17 +50,10 @@ func (u *userRepository) GetByUsername(ctx context.Context, username string) (*e
 		return nil, fmt.Errorf("can't get user by id from db: %w", err)
 	}
 
-	return &entity.User{
-		ID: &entity.UserID{
-			Id: user.ID,
-		},
-		Username: user.Username,
-		Password: user.Password,
-		Role:     user.Role,
-	}, nil
+	return user, nil
 }
 
-func (u *userRepository) Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error) {
+func (u *userRepository) Update(ctx context.Context, id uuid.UUID, user *entity.UserCreate) (*entity.UserDB, error) {
 	userDB, err := u.source.GetUserById(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -79,17 +67,10 @@ func (u *userRepository) Update(ctx context.Context, id *entity.UserID, user *en
 		return nil, fmt.Errorf("Update: can't to update user: %w", err)
 	}
 
-	return &entity.User{
-		ID: &entity.UserID{
-			Id: dbUser.ID,
-		},
-		Username: dbUser.Username,
-		Password: user.Password,
-		Role:     dbUser.Role,
-	}, nil
+	return dbUser, nil
 }
 
-func (u *userRepository) Delete(ctx context.Context, id *entity.UserID) error {
+func (u *userRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	_, err := u.source.GetUserById(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -106,7 +87,7 @@ func (u *userRepository) Delete(ctx context.Context, id *entity.UserID) error {
 	return nil
 }
 
-func (u *userRepository) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (u *userRepository) LikeTrack(ctx context.Context, userId uuid.UUID, trackId uuid.UUID) error {
 	err := u.source.LikeTrack(ctx, userId, trackId)
 	if err != nil {
 		return fmt.Errorf("/db/user.LikeTrack: %w", err)
@@ -115,7 +96,7 @@ func (u *userRepository) LikeTrack(ctx context.Context, userId *entity.UserID, t
 	return nil
 }
 
-func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (u *userRepository) DislikeTrack(ctx context.Context, userId uuid.UUID, trackId uuid.UUID) error {
 	err := u.source.DislikeTrack(ctx, userId, trackId)
 	if err != nil {
 		return fmt.Errorf("/db/user.DislikeTrack: %w", err)
@@ -124,19 +105,19 @@ func (u *userRepository) DislikeTrack(ctx context.Context, userId *entity.UserID
 	return nil
 }
 
-func (u *userRepository) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
+func (u *userRepository) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*entity.MusicDB, error) {
 	musicsDB, err := u.source.ShowLikedTracks(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("/db/user.ShowLikedTracks: %w", err)
 	}
 
-	musics := make([]*entity.Music, len(musicsDB))
-	for i, musicDB := range musicsDB {
-		musics[i] = &entity.Music{
-			Id:   &entity.MusicID{Id: musicDB.Id},
-			Name: musicDB.Name,
-		}
-	}
+	// musics := make([]*entity.Music, len(musicsDB))
+	// for i, musicDB := range musicsDB {
+	// 	musics[i] = &entity.Music{
+	// 		Id:   musicDB.Id,
+	// 		Name: musicDB.Name,
+	// 	}
+	// }
 
-	return musics, nil
+	return musicsDB, nil
 }

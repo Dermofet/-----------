@@ -175,7 +175,7 @@ deps() {
 
 newmigrate() {
     local MIGRATENAME
-    migrate create -ext sql -dir ./cmd/go-test-grpc-http/migrations -seq $MIGRATENAME
+    migrate create -ext sql -dir ./internal/app/migrations -seq $MIGRATENAME
 }
 
 # Добавьте сюда список командx 

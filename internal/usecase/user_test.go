@@ -23,7 +23,7 @@ func Test_userInteractor_Create(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.UserID
+		want    uuid.UUID
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -36,13 +36,9 @@ func Test_userInteractor_Create(t *testing.T) {
 					Password: "qwerty1234",
 				},
 			},
-			want: &entity.UserID{
-				Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-			},
+			want: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			setup: func(a args, f fields) {
-				f.repo.EXPECT().Create(a.ctx, a.user).Return(&entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				}, nil)
+				f.repo.EXPECT().Create(a.ctx, a.user).Return(uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"), nil)
 			},
 			wantErr: false,
 		},
@@ -55,9 +51,9 @@ func Test_userInteractor_Create(t *testing.T) {
 					Password: "qwerty1234",
 				},
 			},
-			want: nil,
+			want: uuid.Nil,
 			setup: func(a args, f fields) {
-				f.repo.EXPECT().Create(a.ctx, a.user).Return(nil, fmt.Errorf("can't create user in repository"))
+				f.repo.EXPECT().Create(a.ctx, a.user).Return(uuid.Nil, fmt.Errorf("can't create user in repository"))
 			},
 			wantErr: true,
 		},
@@ -92,12 +88,12 @@ func Test_userInteractor_GetById(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -105,18 +101,14 @@ func Test_userInteractor_GetById(t *testing.T) {
 			name: "success GetById usecase",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+			want: &entity.UserDB{
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				Username: "John",
 			},
 			setup: func(a args, f fields) {
-				user := &entity.User{
+				user := &entity.UserDB{
 					ID:       a.id,
 					Username: "John",
 				}
@@ -128,7 +120,7 @@ func Test_userInteractor_GetById(t *testing.T) {
 			name: "error GetById usecase",
 			args: args{
 				ctx: context.Background(),
-				id:  nil,
+				id:  uuid.Nil,
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -172,7 +164,7 @@ func Test_userInteractor_GetByUsername(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -182,17 +174,13 @@ func Test_userInteractor_GetByUsername(t *testing.T) {
 				ctx:      context.Background(),
 				username: "John",
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+			want: &entity.UserDB{
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				Username: "John",
 			},
 			setup: func(a args, f fields) {
-				user := &entity.User{
-					ID: &entity.UserID{
-						Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-					},
+				user := &entity.UserDB{
+					ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 					Username: "John",
 				}
 				f.userRepository.EXPECT().GetByUsername(a.ctx, a.username).Return(user, nil)
@@ -241,13 +229,13 @@ func Test_userInteractor_Update(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		id   *entity.UserID
+		id   uuid.UUID
 		user *entity.UserCreate
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -255,25 +243,19 @@ func Test_userInteractor_Update(t *testing.T) {
 			name: "success Update usecase",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				user: &entity.UserCreate{
 					Username: "Paul",
 					Password: "",
 				},
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+			want: &entity.UserDB{
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				Username: "Paul",
 			},
 			setup: func(a args, f fields) {
-				f.repo.EXPECT().Update(a.ctx, a.id, a.user).Return(&entity.User{
-					ID: &entity.UserID{
-						Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-					},
+				f.repo.EXPECT().Update(a.ctx, a.id, a.user).Return(&entity.UserDB{
+					ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 					Username: "Paul",
 				}, nil)
 			},
@@ -283,9 +265,7 @@ func Test_userInteractor_Update(t *testing.T) {
 			name: "error Update usecase",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				user: &entity.UserCreate{
 					Username: "Paul",
 					Password: "",
@@ -328,12 +308,12 @@ func Test_userInteractor_Delete(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -341,9 +321,7 @@ func Test_userInteractor_Delete(t *testing.T) {
 			name: "success Delete usecase",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -355,9 +333,7 @@ func Test_userInteractor_Delete(t *testing.T) {
 			name: "error Delete usecase",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {

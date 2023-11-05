@@ -10,6 +10,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockUserInteractor is a mock of UserInteractor interface.
@@ -36,10 +37,10 @@ func (m *MockUserInteractor) EXPECT() *MockUserInteractorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockUserInteractor) Create(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+func (m *MockUserInteractor) Create(ctx context.Context, user *entity.UserCreate) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, user)
-	ret0, _ := ret[0].(*entity.UserID)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,7 +52,7 @@ func (mr *MockUserInteractorMockRecorder) Create(ctx, user interface{}) *gomock.
 }
 
 // Delete mocks base method.
-func (m *MockUserInteractor) Delete(ctx context.Context, id *entity.UserID) error {
+func (m *MockUserInteractor) Delete(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -65,7 +66,7 @@ func (mr *MockUserInteractorMockRecorder) Delete(ctx, id interface{}) *gomock.Ca
 }
 
 // DislikeTrack mocks base method.
-func (m *MockUserInteractor) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserInteractor) DislikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DislikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -79,10 +80,10 @@ func (mr *MockUserInteractorMockRecorder) DislikeTrack(ctx, userId, trackId inte
 }
 
 // GetById mocks base method.
-func (m *MockUserInteractor) GetById(ctx context.Context, id *entity.UserID) (*entity.User, error) {
+func (m *MockUserInteractor) GetById(ctx context.Context, id uuid.UUID) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", ctx, id)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,10 +95,10 @@ func (mr *MockUserInteractorMockRecorder) GetById(ctx, id interface{}) *gomock.C
 }
 
 // GetByUsername mocks base method.
-func (m *MockUserInteractor) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
+func (m *MockUserInteractor) GetByUsername(ctx context.Context, username string) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -109,7 +110,7 @@ func (mr *MockUserInteractorMockRecorder) GetByUsername(ctx, username interface{
 }
 
 // LikeTrack mocks base method.
-func (m *MockUserInteractor) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserInteractor) LikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -123,10 +124,10 @@ func (mr *MockUserInteractorMockRecorder) LikeTrack(ctx, userId, trackId interfa
 }
 
 // ShowLikedTracks mocks base method.
-func (m *MockUserInteractor) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.Music, error) {
+func (m *MockUserInteractor) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ShowLikedTracks", ctx, id)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -138,10 +139,10 @@ func (mr *MockUserInteractorMockRecorder) ShowLikedTracks(ctx, id interface{}) *
 }
 
 // Update mocks base method.
-func (m *MockUserInteractor) Update(ctx context.Context, id *entity.UserID, user *entity.UserCreate) (*entity.User, error) {
+func (m *MockUserInteractor) Update(ctx context.Context, id uuid.UUID, user *entity.UserCreate) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, id, user)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*entity.UserDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -176,7 +177,7 @@ func (m *MockMusicInteractor) EXPECT() *MockMusicInteractorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockMusicInteractor) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
+func (m *MockMusicInteractor) Create(ctx context.Context, musicCreate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, musicCreate)
 	ret0, _ := ret[0].(error)
@@ -190,7 +191,7 @@ func (mr *MockMusicInteractorMockRecorder) Create(ctx, musicCreate interface{}) 
 }
 
 // Delete mocks base method.
-func (m *MockMusicInteractor) Delete(ctx context.Context, id *entity.MusicID) error {
+func (m *MockMusicInteractor) Delete(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -203,11 +204,26 @@ func (mr *MockMusicInteractorMockRecorder) Delete(ctx, id interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockMusicInteractor)(nil).Delete), ctx, id)
 }
 
+// Get mocks base method.
+func (m *MockMusicInteractor) Get(ctx context.Context, musicId uuid.UUID) (*entity.MusicDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, musicId)
+	ret0, _ := ret[0].(*entity.MusicDB)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockMusicInteractorMockRecorder) Get(ctx, musicId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMusicInteractor)(nil).Get), ctx, musicId)
+}
+
 // GetAll mocks base method.
-func (m *MockMusicInteractor) GetAll(ctx context.Context) ([]*entity.Music, error) {
+func (m *MockMusicInteractor) GetAll(ctx context.Context) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx)
-	ret0, _ := ret[0].([]*entity.Music)
+	ret0, _ := ret[0].([]*entity.MusicDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -218,8 +234,38 @@ func (mr *MockMusicInteractorMockRecorder) GetAll(ctx interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockMusicInteractor)(nil).GetAll), ctx)
 }
 
+// GetAllSortByTime mocks base method.
+func (m *MockMusicInteractor) GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllSortByTime", ctx)
+	ret0, _ := ret[0].([]*entity.MusicDB)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllSortByTime indicates an expected call of GetAllSortByTime.
+func (mr *MockMusicInteractorMockRecorder) GetAllSortByTime(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllSortByTime", reflect.TypeOf((*MockMusicInteractor)(nil).GetAllSortByTime), ctx)
+}
+
+// GetAndSortByPopular mocks base method.
+func (m *MockMusicInteractor) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAndSortByPopular", ctx)
+	ret0, _ := ret[0].([]*entity.MusicDB)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAndSortByPopular indicates an expected call of GetAndSortByPopular.
+func (mr *MockMusicInteractorMockRecorder) GetAndSortByPopular(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAndSortByPopular", reflect.TypeOf((*MockMusicInteractor)(nil).GetAndSortByPopular), ctx)
+}
+
 // Update mocks base method.
-func (m *MockMusicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicCreate) error {
+func (m *MockMusicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
 	ret0, _ := ret[0].(error)

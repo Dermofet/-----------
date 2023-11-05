@@ -151,6 +151,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/music/download/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "JwtAuth": []
+                    }
+                ],
+                "description": "Скачивание файла трека по id трека",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Music"
+                ],
+                "summary": "Скачивание файла трека",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id трека",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Файл трека",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный запрос"
+                    },
+                    "401": {
+                        "description": "Неавторизованный запрос"
+                    },
+                    "404": {
+                        "description": "Пользователь не найден"
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера"
+                    }
+                }
+            }
+        },
         "/music/new": {
             "post": {
                 "security": [
@@ -171,13 +217,21 @@ const docTemplate = `{
                 "summary": "Создание трека",
                 "parameters": [
                     {
-                        "description": "Данные трека",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.MusicCreate"
-                        }
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "release",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Файл трека",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -305,13 +359,27 @@ const docTemplate = `{
                 "summary": "Обновление трека",
                 "parameters": [
                     {
-                        "description": "Данные трека",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.MusicCreate"
-                        }
+                        "type": "string",
+                        "description": "id трека",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "release",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Файл трека",
+                        "name": "file",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -443,9 +511,12 @@ const docTemplate = `{
                 "summary": "Показать понравившиеся треки",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Список понравившихся треков",
                         "schema": {
-                            "$ref": "#/definitions/view.ListMusicView"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.MusicView"
+                            }
                         }
                     },
                     "400": {
@@ -841,25 +912,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entity.CustomDate": {
-            "type": "object",
-            "properties": {
-                "time.Time": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.MusicCreate": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "release": {
-                    "$ref": "#/definitions/entity.CustomDate"
-                }
-            }
-        },
         "entity.UserCreate": {
             "type": "object",
             "properties": {
@@ -873,24 +925,23 @@ const docTemplate = `{
                 }
             }
         },
-        "view.ListMusicView": {
-            "type": "object",
-            "properties": {
-                "musics": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/view.MusicView"
-                    }
-                }
-            }
-        },
         "view.MusicView": {
             "type": "object",
             "properties": {
+                "duration": {
+                    "description": "продолжительность трека",
+                    "type": "string"
+                },
                 "id": {
+                    "description": "id трека",
                     "type": "string"
                 },
                 "name": {
+                    "description": "название трека",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "размер файла трека (в удобном для чтения виде)",
                     "type": "string"
                 }
             }

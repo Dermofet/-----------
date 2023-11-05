@@ -104,11 +104,9 @@ func (r *router) registerRoutes() error {
 	userInteractor := usecase.NewUserInteractor(userRepository)
 	musicInteractor := usecase.NewMusicInteractor(musicRepository)
 
-	userPresenter := presenter.NewUserPresenter()
-	tokenPresenter := presenter.NewTokenPresenter()
-	musicPresenter := presenter.NewMusicPresenter()
+	presenter := presenter.NewPresenter()
 
-	r.handlers.authHandlers = handlers.NewAuthHandlers(userInteractor, tokenPresenter)
+	r.handlers.authHandlers = handlers.NewAuthHandlers(userInteractor, presenter)
 
 	authGroup := basePath.Group("/auth")
 	authGroup.POST("/signup", r.handlers.authHandlers.SignUp)
@@ -118,7 +116,7 @@ func (r *router) registerRoutes() error {
 	{
 		userGroup.Use(middlewares.NewAuthMiddleware())
 
-		r.handlers.userHandlers = handlers.NewUserHandlers(userInteractor, userPresenter)
+		r.handlers.userHandlers = handlers.NewUserHandlers(userInteractor, presenter)
 		userGroup.GET("/me", r.handlers.userHandlers.GetMeHandler)
 		userGroup.PUT("/me", r.handlers.userHandlers.UpdateMeHandler)
 		userGroup.DELETE("/me", r.handlers.userHandlers.DeleteMeHandler)
@@ -151,13 +149,13 @@ func (r *router) registerRoutes() error {
 		userGroup.GET("/get-liked-tracks", r.handlers.userHandlers.ShowLikedTracks)
 	}
 
-	r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor, musicPresenter)
+	r.handlers.musicHandlers = handlers.NewMusicHandlers(musicInteractor, presenter)
 	musicGroup := basePath.Group("/music")
 	{
 		musicGroup.Use(middlewares.NewAuthMiddleware())
 
 		musicGroup.GET("/catalog", r.handlers.musicHandlers.GetAll)
-		musicGroup.GET("/:id", r.handlers.musicHandlers.Get)
+		musicGroup.GET("/download/:id", r.handlers.musicHandlers.Get)
 		musicGroup.GET("/release", r.handlers.musicHandlers.GetAllSortByTime)
 		musicGroup.GET("/popular", r.handlers.musicHandlers.GetAndSortByPopular)
 		musicGroup.POST(

@@ -32,17 +32,20 @@ func (m *musicSource) GetAll(ctx context.Context) ([]*entity.MusicDB, error) {
 	var data []*entity.MusicDB
 	for i := 0; rows.Next(); i++ {
 		var scanEntity entity.MusicDB
-		rows.StructScan(&scanEntity)
+		err := rows.StructScan(&scanEntity)
+		if err != nil {
+			return nil, fmt.Errorf("can't scan music: %w", err)
+		}
 		data = append(data, &scanEntity)
 	}
 	return data, nil
 }
 
-func (m *musicSource) Get(ctx context.Context, musicId *entity.MusicID) (*entity.MusicDB, error) {
+func (m *musicSource) Get(ctx context.Context, musicId uuid.UUID) (*entity.MusicDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := m.db.QueryRowxContext(dbCtx, "SELECT * FROM music WHERE id = $1", musicId.Id)
+	row := m.db.QueryRowxContext(dbCtx, "SELECT * FROM music WHERE id = $1", musicId)
 	if row.Err() != nil {
 		return nil, fmt.Errorf("can't exec query: %w", row.Err())
 	}
@@ -54,6 +57,7 @@ func (m *musicSource) Get(ctx context.Context, musicId *entity.MusicID) (*entity
 		}
 		return nil, fmt.Errorf("can't scan music: %w", err)
 	}
+
 	return &data, nil
 }
 
@@ -62,10 +66,10 @@ func (m *musicSource) GetAndSortByPopular(ctx context.Context) ([]*entity.MusicD
 	defer dbCancel()
 
 	rows, err := m.db.QueryxContext(dbCtx,
-		"SELECT m.id AS id, m.name AS name\n"+
-			"FROM music m\n"+
-			"LEFT JOIN user_music um ON um.music_id = m.id\n"+
-			"GROUP BY m.id, m.name\n"+
+		"SELECT m.id AS id, m.name AS name "+
+			"FROM music m "+
+			"LEFT JOIN user_music um ON um.music_id = m.id "+
+			"GROUP BY m.id, m.name "+
 			"ORDER BY COALESCE(COUNT(um.music_id), 0) DESC;",
 	)
 	if err != nil {
@@ -101,7 +105,6 @@ func (m *musicSource) GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, 
 		if err != nil {
 			return nil, fmt.Errorf("can't scan music: %w", err)
 		}
-		fmt.Println(scanEntity)
 		data = append(data, &scanEntity)
 	}
 
@@ -113,7 +116,8 @@ func (m *musicSource) Create(ctx context.Context, musicDb *entity.MusicDB) error
 	defer dbCancel()
 
 	newuuid := uuid.New()
-	_, err := m.db.ExecContext(dbCtx, "INSERT INTO music (id, name, release_date, file_name) VALUES ($1, $2, $3, $4)", newuuid, musicDb.Name, musicDb.Release, musicDb.FileName)
+	_, err := m.db.ExecContext(dbCtx, "INSERT INTO music (id, name, release_date, file_name, size, duration) VALUES ($1, $2, $3, $4, $5, $6)",
+		newuuid, musicDb.Name, musicDb.Release, musicDb.FileName, musicDb.Size, musicDb.Duration)
 	if err != nil {
 		return fmt.Errorf("can't exec query: %w", err)
 	}
@@ -125,12 +129,14 @@ func (m *musicSource) Update(ctx context.Context, musicDb *entity.MusicDB) error
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 	if musicDb.FileName != "" {
-		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $1, release_date = $3, file_name = $4 WHERE id = $2", musicDb.Name, musicDb.Id, musicDb.Release, musicDb.FileName)
+		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $2, release_date = $3, file_name = $4, size = $5, duration = $6 WHERE id = $1",
+			musicDb.Id, musicDb.Name, musicDb.Release, musicDb.FileName, musicDb.Size, musicDb.Duration)
 		if err != nil {
 			return fmt.Errorf("can't exec query: %w", err)
 		}
 	} else {
-		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $1, release_date = $3 WHERE id = $2", musicDb.Name, musicDb.Id, musicDb.Release)
+		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $1, release_date = $3, size = $4, duration = $5 WHERE id = $2",
+			musicDb.Id, musicDb.Name, musicDb.Release, musicDb.Size, musicDb.Duration)
 		if err != nil {
 			return fmt.Errorf("can't exec query: %w", err)
 		}
@@ -139,10 +145,10 @@ func (m *musicSource) Update(ctx context.Context, musicDb *entity.MusicDB) error
 	return nil
 }
 
-func (m *musicSource) Delete(ctx context.Context, id *entity.MusicID) error {
+func (m *musicSource) Delete(ctx context.Context, id uuid.UUID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
-	_, err := m.db.ExecContext(dbCtx, "DELETE FROM music WHERE id = $1", id.Id)
+	_, err := m.db.ExecContext(dbCtx, "DELETE FROM music WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("can't exec query: %w", err)
 	}

@@ -23,7 +23,7 @@ func Test_userRepository_Create(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.UserID
+		want    uuid.UUID
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -36,13 +36,9 @@ func Test_userRepository_Create(t *testing.T) {
 					Password: "qwerty1234",
 				},
 			},
-			want: &entity.UserID{
-				Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-			},
+			want: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			setup: func(a args, f fields) {
-				f.source.EXPECT().CreateUser(a.ctx, a.user).Return(&entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				}, nil)
+				f.source.EXPECT().CreateUser(a.ctx, a.user).Return(uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"), nil)
 			},
 			wantErr: false,
 		},
@@ -55,7 +51,7 @@ func Test_userRepository_Create(t *testing.T) {
 					Password: "qwerty1234",
 				},
 			},
-			want: nil,
+			want: uuid.Nil,
 			setup: func(a args, f fields) {
 				f.source.EXPECT().CreateUser(a.ctx, a.user).Return(nil, fmt.Errorf("can't create user in source"))
 			},
@@ -91,12 +87,12 @@ func Test_userRepository_GetById(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    uuid.UUID
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -104,15 +100,9 @@ func Test_userRepository_GetById(t *testing.T) {
 			name: "success: GetById userRepository",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
-			},
+			want: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			setup: func(a args, f fields) {
 				f.source.EXPECT().GetUserById(a.ctx, a.id).Return(&entity.UserDB{
 					ID: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
@@ -124,11 +114,11 @@ func Test_userRepository_GetById(t *testing.T) {
 			name: "error: GetById userRepository",
 			args: args{
 				ctx: context.Background(),
-				id:  nil,
+				id:  uuid.Nil,
 			},
-			want: nil,
+			want: uuid.Nil,
 			setup: func(a args, f fields) {
-				f.source.EXPECT().GetUserById(a.ctx, a.id).Return(nil, fmt.Errorf("can't get user from source"))
+				f.source.EXPECT().GetUserById(a.ctx, a.id).Return(uuid.Nil, fmt.Errorf("can't get user from source"))
 			},
 			wantErr: true,
 		},
@@ -167,7 +157,7 @@ func Test_userRepository_GetByUsername(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    uuid.UUID
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -177,11 +167,7 @@ func Test_userRepository_GetByUsername(t *testing.T) {
 				ctx:      context.Background(),
 				username: "John",
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
-			},
+			want: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			setup: func(a args, f fields) {
 				f.source.EXPECT().GetUserByUsername(a.ctx, a.username).Return(&entity.UserDB{
 					ID: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
@@ -195,7 +181,7 @@ func Test_userRepository_GetByUsername(t *testing.T) {
 				ctx:      context.Background(),
 				username: "",
 			},
-			want: nil,
+			want: uuid.Nil,
 			setup: func(a args, f fields) {
 				f.source.EXPECT().GetUserByUsername(a.ctx, a.username).Return(nil, fmt.Errorf("can't get user from source"))
 			},
@@ -231,13 +217,13 @@ func Test_userRepository_Update(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		id   *entity.UserID
+		id   uuid.UUID
 		user *entity.UserCreate
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *entity.User
+		want    *entity.UserDB
 		setup   func(a args, f fields)
 		wantErr bool
 	}{
@@ -250,11 +236,10 @@ func Test_userRepository_Update(t *testing.T) {
 					Password: "",
 				},
 			},
-			want: &entity.User{
-				ID: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+			want: &entity.UserDB{
+				ID:       uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 				Username: "Paul",
+				Role:     "USER",
 			},
 			setup: func(a args, f fields) {
 				f.source.EXPECT().GetUserById(a.ctx, a.id).Return(&entity.UserDB{
@@ -313,7 +298,7 @@ func Test_userRepository_Delete(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  *entity.UserID
+		id  uuid.UUID
 	}
 	tests := []struct {
 		name    string
@@ -326,9 +311,7 @@ func Test_userRepository_Delete(t *testing.T) {
 			name: "success: Delete userRepository",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: nil,
 			setup: func(a args, f fields) {
@@ -344,9 +327,7 @@ func Test_userRepository_Delete(t *testing.T) {
 			name: "error: Delete userRepository",
 			args: args{
 				ctx: context.Background(),
-				id: &entity.UserID{
-					Id: uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
-				},
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
 			},
 			want: fmt.Errorf("can't delete user in source"),
 			setup: func(a args, f fields) {

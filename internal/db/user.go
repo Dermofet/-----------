@@ -20,7 +20,7 @@ func NewUserSourсe(source *source) *UserSourсe {
 	}
 }
 
-func (u *UserSourсe) CreateUser(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+func (u *UserSourсe) CreateUser(ctx context.Context, user *entity.UserCreate) (uuid.UUID, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
@@ -29,15 +29,13 @@ func (u *UserSourсe) CreateUser(ctx context.Context, user *entity.UserCreate) (
 	row := u.db.QueryRowxContext(dbCtx, "INSERT INTO users (id, username, password) VALUES ($1, $2, $3)",
 		newUuid, user.Username, user.Password)
 	if row.Err() != nil {
-		return nil, fmt.Errorf("can't exec query: %w", row.Err())
+		return uuid.Nil, fmt.Errorf("can't exec query: %w", row.Err())
 	}
 
-	return &entity.UserID{
-		Id: newUuid,
-	}, nil
+	return newUuid, nil
 }
 
-func (u *UserSourсe) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
+func (u *UserSourсe) GetUserById(ctx context.Context, id uuid.UUID) (*entity.UserDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
@@ -92,7 +90,7 @@ func (u *UserSourсe) UpdateUser(ctx context.Context, userDB *entity.UserDB, use
 	return userDB, nil
 }
 
-func (u *UserSourсe) DeleteUser(ctx context.Context, id *entity.UserID) error {
+func (u *UserSourсe) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
@@ -104,7 +102,7 @@ func (u *UserSourсe) DeleteUser(ctx context.Context, id *entity.UserID) error {
 	return nil
 }
 
-func (u *UserSourсe) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (u *UserSourсe) LikeTrack(ctx context.Context, userId uuid.UUID, trackId uuid.UUID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
@@ -116,7 +114,7 @@ func (u *UserSourсe) LikeTrack(ctx context.Context, userId *entity.UserID, trac
 	return nil
 }
 
-func (u *UserSourсe) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (u *UserSourсe) DislikeTrack(ctx context.Context, userId uuid.UUID, trackId uuid.UUID) error {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
@@ -128,13 +126,13 @@ func (u *UserSourсe) DislikeTrack(ctx context.Context, userId *entity.UserID, t
 	return nil
 }
 
-func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.MusicDB, error) {
+func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*entity.MusicDB, error) {
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
 	rows, err := u.db.QueryxContext(
 		dbCtx,
-		"SELECT name FROM music JOIN user_music ON music.id = user_music.music_id WHERE user_music.user_id = $1",
+		"SELECT music.* FROM music JOIN user_music ON music.id = user_music.music_id WHERE user_music.user_id = $1",
 		id.String(),
 	)
 	if err != nil {
@@ -148,6 +146,7 @@ func (u *UserSourсe) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(scanEntity)
 		data = append(data, &scanEntity)
 	}
 

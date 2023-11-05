@@ -83,6 +83,8 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
   - id (uuid)
   - name (varchar)
   - release_date (date)
+  - size (numeric)
+  - duration (interval)
 
 - user_music
   - user_id (uuid)
@@ -129,6 +131,8 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
       - <span style="color: lightblue;">Файлы репозиториев</span>
     - usecase/
       - <span style="color: lightblue;">Файлы сервисов</span>
+    - utils/
+      - <span style="color: lightblue;">Файлы утилит</span>
   - README.md
   - run.sh
 
@@ -147,7 +151,7 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
 **Описание**: Этот эндпоинт предназначен для регистрации нового пользователя. Пользователь должен предоставить свои учетные данные, такие как имя пользователя и пароль. После успешной регистрации пользователь получает токен доступа.
 
 **Тело запроса:**
-```json
+```text
 {
   "username": <имя_пользователя>,
   "password": <пароль_пользователя>
@@ -157,7 +161,7 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
 **Пример запроса:**
 ```text
 POST /auth/signup
-Content-Type: application/json
+Content-Type: application/text
 
 {
   "username": <имя_пользователя>,
@@ -167,7 +171,7 @@ Content-Type: application/json
 
 **Примеры ответов**
 - Статус 201 Created
-    ```json
+    ```text
     {
       "token": <токен_доступа>
     }
@@ -186,7 +190,7 @@ Content-Type: application/json
 **Описание**: Этот эндпоинт предназначен для аутентификации пользователя. Пользователь должен предоставить свой адрес электронной почты и пароль. После успешной аутентификации пользователь получает токен доступа.
 
 **Тело запроса:**
-```json
+```text
 {
   "username": <имя_пользователя>,
   "password": <пароль_пользователя>
@@ -196,7 +200,7 @@ Content-Type: application/json
 **Пример запроса:**
 ```text
 POST /auth/signup
-Content-Type: application/json
+Content-Type: application/text
 
 {
   "username": <имя_пользователя>,
@@ -206,7 +210,7 @@ Content-Type: application/json
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```json
+    ```text
     {
       "token": <токен_доступа>
     }
@@ -234,7 +238,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```json
+  ```text
   {
     "id": <id_пользователя>,
     "role": <роль_пользователя>,
@@ -265,7 +269,7 @@ Authorization: Bearer <токен_доступа>
 ```text
 PUT /users/me
 Authorization: Bearer <токен_доступа>
-Content-Type: application/json
+Content-Type: application/text
 
 {
   "username": <имя_пользователя>,
@@ -275,7 +279,7 @@ Content-Type: application/json
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```json
+    ```text
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -329,7 +333,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```json
+    ```text
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -361,7 +365,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```json
+    ```text
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -386,7 +390,7 @@ Authorization: Bearer <токен_доступа>
 - id (uuid): id пользователя
 
 **Тело запроса:**
-```json
+```text
 {
   "password": <пароль_пользователя>,
   "username": <имя_пользователя>
@@ -406,7 +410,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```json
+    ```text
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -507,11 +511,13 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```json
+  ```text
   [
     {
+      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
+      "size": <размер_файла>
     }
   ]
   ```
@@ -538,11 +544,13 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```json
+  ```text
   [
     {
+      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
+      "size": <размер_файла>
     }
   ]
   ```
@@ -567,11 +575,13 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```json
+  ```text
   [
     {
+      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
+      "size": <размер_файла>
     }
   ]
   ```
@@ -596,11 +606,13 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```json
+  ```text
   [
     {
+      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
+      "size": <размер_файла>
     }
   ]
   ```
@@ -617,15 +629,10 @@ Authorization: Bearer <токен_доступа>
 
 **Описание**: Этот эндпоинт предназначен для получения списка треков, отсортированных по дате релиза.
 
-**Тело запроса:**
-```json
-{
-  "name": <название_трека>,
-  "release": {
-    "time.Time": <дата_релиза>,
-  }
-}
-```
+**Форма в запросе:**
+- name (string): название трека
+- release (time.Time): дата релиза
+- file (file): файл трека
 
 **Пример запроса:**
 ```text
@@ -634,22 +641,13 @@ Authorization: Bearer <токен_доступа>
 
 {
   "name": <название_трека>,
-  "release": {
-    "time.Time": <дата_релиза>,
-  }
+  "release": <дата_релиза>,
+  "file": <файл_трека>
 }
 ```
 
 **Примеры ответов:**
 - Статус 201 Created
-  ```json
-  [
-    {
-      "id": <id_трека>,
-      "name": <название_трека>,
-    }
-  ]
-  ```
 - Статус 401 Unauthorized
 - Статус 403 Forrbiden
 - Статус 422 UnprocessableEntity
@@ -663,15 +661,11 @@ Authorization: Bearer <токен_доступа>
 
 **Описание**: Этот эндпоинт предназначен для обновления трека по id.
 
-**Тело запроса:**
-```json
-{
-  "name": <название_трека>,
-  "release": {
-    "time.Time": <дата_релиза>,
-  }
-}
-```
+**Форма в запросе:**
+- id (uuid): id трека
+- name (string): название трека
+- release (time.Time): дата релиза
+- file (file): файл трека
 
 **Пример запроса:**
 ```text
@@ -679,10 +673,10 @@ PUT /music/{id}
 Authorization: Bearer <токен_доступа>
 
 {
+  "id": <id_трека>,
   "name": <название_трека>,
-  "release": {
-    "time.Time": <дата_релиза>,
-  }
+  "release": <дата_релиза>,
+  "file": <файл_трека>
 }
 ```
 

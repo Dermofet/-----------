@@ -3,11 +3,11 @@ package middlewares
 import (
 	"context"
 	"fmt"
-	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // The NewCheckAdminMiddleware function is a middleware that checks if the user is an admin.
@@ -20,7 +20,7 @@ func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteracto
 		}
 
 		ctx := context.Background()
-		user, err := userInteractor.GetById(ctx, userId.(*entity.UserID))
+		user, err := userInteractor.GetById(ctx, userId.(uuid.UUID))
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("can't get user: %w", err))
 			return

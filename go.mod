@@ -67,4 +67,7 @@ require (
 	go.uber.org/zap v1.24.0
 )
 
-require golang.org/x/sys v0.12.0 // indirect
+require (
+	github.com/tcolgate/mp3 v0.0.0-20170426193717-e79c5a46d300
+	golang.org/x/sys v0.12.0 // indirect
+)

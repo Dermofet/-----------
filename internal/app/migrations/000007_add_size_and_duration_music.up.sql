@@ -1,0 +1,3 @@
+ALTER TABLE music
+    ADD COLUMN size NUMERIC,
+    ADD COLUMN duration INTERVAL;

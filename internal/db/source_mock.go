@@ -10,6 +10,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockUserSource is a mock of UserSource interface.
@@ -36,10 +37,10 @@ func (m *MockUserSource) EXPECT() *MockUserSourceMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockUserSource) CreateUser(ctx context.Context, user *entity.UserCreate) (*entity.UserID, error) {
+func (m *MockUserSource) CreateUser(ctx context.Context, user *entity.UserCreate) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, user)
-	ret0, _ := ret[0].(*entity.UserID)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,7 +52,7 @@ func (mr *MockUserSourceMockRecorder) CreateUser(ctx, user interface{}) *gomock.
 }
 
 // DeleteUser mocks base method.
-func (m *MockUserSource) DeleteUser(ctx context.Context, id *entity.UserID) error {
+func (m *MockUserSource) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -65,7 +66,7 @@ func (mr *MockUserSourceMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Ca
 }
 
 // DislikeTrack mocks base method.
-func (m *MockUserSource) DislikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserSource) DislikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DislikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -79,7 +80,7 @@ func (mr *MockUserSourceMockRecorder) DislikeTrack(ctx, userId, trackId interfac
 }
 
 // GetUserById mocks base method.
-func (m *MockUserSource) GetUserById(ctx context.Context, id *entity.UserID) (*entity.UserDB, error) {
+func (m *MockUserSource) GetUserById(ctx context.Context, id uuid.UUID) (*entity.UserDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", ctx, id)
 	ret0, _ := ret[0].(*entity.UserDB)
@@ -109,7 +110,7 @@ func (mr *MockUserSourceMockRecorder) GetUserByUsername(ctx, email interface{}) 
 }
 
 // LikeTrack mocks base method.
-func (m *MockUserSource) LikeTrack(ctx context.Context, userId *entity.UserID, trackId *entity.MusicID) error {
+func (m *MockUserSource) LikeTrack(ctx context.Context, userId, trackId uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LikeTrack", ctx, userId, trackId)
 	ret0, _ := ret[0].(error)
@@ -123,7 +124,7 @@ func (mr *MockUserSourceMockRecorder) LikeTrack(ctx, userId, trackId interface{}
 }
 
 // ShowLikedTracks mocks base method.
-func (m *MockUserSource) ShowLikedTracks(ctx context.Context, id *entity.UserID) ([]*entity.MusicDB, error) {
+func (m *MockUserSource) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*entity.MusicDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ShowLikedTracks", ctx, id)
 	ret0, _ := ret[0].([]*entity.MusicDB)
@@ -176,21 +177,21 @@ func (m *MockMusicSource) EXPECT() *MockMusicSourceMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockMusicSource) Create(ctx context.Context, musicCreate *entity.MusicCreate) error {
+func (m *MockMusicSource) Create(ctx context.Context, musicDb *entity.MusicDB) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, musicCreate)
+	ret := m.ctrl.Call(m, "Create", ctx, musicDb)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockMusicSourceMockRecorder) Create(ctx, musicCreate interface{}) *gomock.Call {
+func (mr *MockMusicSourceMockRecorder) Create(ctx, musicDb interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMusicSource)(nil).Create), ctx, musicCreate)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMusicSource)(nil).Create), ctx, musicDb)
 }
 
 // Delete mocks base method.
-func (m *MockMusicSource) Delete(ctx context.Context, id *entity.MusicID) error {
+func (m *MockMusicSource) Delete(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -201,6 +202,21 @@ func (m *MockMusicSource) Delete(ctx context.Context, id *entity.MusicID) error 
 func (mr *MockMusicSourceMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockMusicSource)(nil).Delete), ctx, id)
+}
+
+// Get mocks base method.
+func (m *MockMusicSource) Get(ctx context.Context, musicId uuid.UUID) (*entity.MusicDB, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, musicId)
+	ret0, _ := ret[0].(*entity.MusicDB)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockMusicSourceMockRecorder) Get(ctx, musicId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMusicSource)(nil).Get), ctx, musicId)
 }
 
 // GetAll mocks base method.
@@ -249,15 +265,15 @@ func (mr *MockMusicSourceMockRecorder) GetAndSortByPopular(ctx interface{}) *gom
 }
 
 // Update mocks base method.
-func (m *MockMusicSource) Update(ctx context.Context, musicUpdate *entity.MusicDB) error {
+func (m *MockMusicSource) Update(ctx context.Context, musicDb *entity.MusicDB) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
+	ret := m.ctrl.Call(m, "Update", ctx, musicDb)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockMusicSourceMockRecorder) Update(ctx, musicUpdate interface{}) *gomock.Call {
+func (mr *MockMusicSourceMockRecorder) Update(ctx, musicDb interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicSource)(nil).Update), ctx, musicUpdate)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicSource)(nil).Update), ctx, musicDb)
 }
