@@ -135,8 +135,8 @@ func (m *musicSource) Update(ctx context.Context, musicDb *entity.MusicDB) error
 			return fmt.Errorf("can't exec query: %w", err)
 		}
 	} else {
-		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $1, release_date = $3, size = $4, duration = $5 WHERE id = $2",
-			musicDb.Id, musicDb.Name, musicDb.Release, musicDb.Size, musicDb.Duration)
+		_, err := m.db.ExecContext(dbCtx, "UPDATE music SET name = $2, release_date = $3 WHERE id = $1",
+			musicDb.Id, musicDb.Name, musicDb.Release)
 		if err != nil {
 			return fmt.Errorf("can't exec query: %w", err)
 		}

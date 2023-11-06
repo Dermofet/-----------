@@ -83,8 +83,6 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
   - id (uuid)
   - name (varchar)
   - release_date (date)
-  - size (numeric)
-  - duration (interval)
 
 - user_music
   - user_id (uuid)
@@ -131,8 +129,6 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
       - <span style="color: lightblue;">Файлы репозиториев</span>
     - usecase/
       - <span style="color: lightblue;">Файлы сервисов</span>
-    - utils/
-      - <span style="color: lightblue;">Файлы утилит</span>
   - README.md
   - run.sh
 
@@ -151,7 +147,7 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
 **Описание**: Этот эндпоинт предназначен для регистрации нового пользователя. Пользователь должен предоставить свои учетные данные, такие как имя пользователя и пароль. После успешной регистрации пользователь получает токен доступа.
 
 **Тело запроса:**
-```text
+```json
 {
   "username": <имя_пользователя>,
   "password": <пароль_пользователя>
@@ -161,7 +157,7 @@ swag init -g .\cmd\music-backend-test\main.go --parseInternal
 **Пример запроса:**
 ```text
 POST /auth/signup
-Content-Type: application/text
+Content-Type: application/json
 
 {
   "username": <имя_пользователя>,
@@ -171,7 +167,7 @@ Content-Type: application/text
 
 **Примеры ответов**
 - Статус 201 Created
-    ```text
+    ```json
     {
       "token": <токен_доступа>
     }
@@ -190,7 +186,7 @@ Content-Type: application/text
 **Описание**: Этот эндпоинт предназначен для аутентификации пользователя. Пользователь должен предоставить свой адрес электронной почты и пароль. После успешной аутентификации пользователь получает токен доступа.
 
 **Тело запроса:**
-```text
+```json
 {
   "username": <имя_пользователя>,
   "password": <пароль_пользователя>
@@ -200,7 +196,7 @@ Content-Type: application/text
 **Пример запроса:**
 ```text
 POST /auth/signup
-Content-Type: application/text
+Content-Type: application/json
 
 {
   "username": <имя_пользователя>,
@@ -210,7 +206,7 @@ Content-Type: application/text
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```text
+    ```json
     {
       "token": <токен_доступа>
     }
@@ -238,7 +234,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```text
+  ```json
   {
     "id": <id_пользователя>,
     "role": <роль_пользователя>,
@@ -269,7 +265,7 @@ Authorization: Bearer <токен_доступа>
 ```text
 PUT /users/me
 Authorization: Bearer <токен_доступа>
-Content-Type: application/text
+Content-Type: application/json
 
 {
   "username": <имя_пользователя>,
@@ -279,7 +275,7 @@ Content-Type: application/text
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```text
+    ```json
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -333,7 +329,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```text
+    ```json
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -365,7 +361,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```text
+    ```json
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -390,7 +386,7 @@ Authorization: Bearer <токен_доступа>
 - id (uuid): id пользователя
 
 **Тело запроса:**
-```text
+```json
 {
   "password": <пароль_пользователя>,
   "username": <имя_пользователя>
@@ -410,7 +406,7 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-    ```text
+    ```json
     {
       "id": <id_пользователя>,
       "role": <роль_пользователя>,
@@ -511,13 +507,11 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```text
+  ```json
   [
     {
-      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
-      "size": <размер_файла>
     }
   ]
   ```
@@ -544,13 +538,11 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```text
+  ```json
   [
     {
-      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
-      "size": <размер_файла>
     }
   ]
   ```
@@ -575,13 +567,11 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```text
+  ```json
   [
     {
-      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
-      "size": <размер_файла>
     }
   ]
   ```
@@ -606,13 +596,11 @@ Authorization: Bearer <токен_доступа>
 
 **Примеры ответов:**
 - Статус 200 OK
-  ```text
+  ```json
   [
     {
-      "duration": <продолжительность_трека>,
       "id": <id_трека>,
       "name": <название_трека>,
-      "size": <размер_файла>
     }
   ]
   ```
@@ -627,12 +615,15 @@ Authorization: Bearer <токен_доступа>
 
 **Метод**: POST
 
-**Описание**: Этот эндпоинт предназначен для получения списка треков, отсортированных по дате релиза.
+**Описание**: Этот эндпоинт предназначен для получения списка треков, отсортированных по дате релиза. Формат даты - "2006-01-02"
 
-**Форма в запросе:**
-- name (string): название трека
-- release (time.Time): дата релиза
-- file (file): файл трека
+**Тело запроса:**
+```json
+{
+  "name": <название_трека>,
+  "release":  <дата_релиза>,
+}
+```
 
 **Пример запроса:**
 ```text
@@ -642,7 +633,6 @@ Authorization: Bearer <токен_доступа>
 {
   "name": <название_трека>,
   "release": <дата_релиза>,
-  "file": <файл_трека>
 }
 ```
 
@@ -659,13 +649,15 @@ Authorization: Bearer <токен_доступа>
 
 **Метод**: PUT
 
-**Описание**: Этот эндпоинт предназначен для обновления трека по id.
+**Описание**: Этот эндпоинт предназначен для обновления трека по id. Формат даты - "2006-01-02"
 
-**Форма в запросе:**
-- id (uuid): id трека
-- name (string): название трека
-- release (time.Time): дата релиза
-- file (file): файл трека
+**Тело запроса:**
+```json
+{
+  "name": <название_трека>,
+  "release":  <дата_релиза>,
+}
+```
 
 **Пример запроса:**
 ```text
@@ -673,15 +665,13 @@ PUT /music/{id}
 Authorization: Bearer <токен_доступа>
 
 {
-  "id": <id_трека>,
   "name": <название_трека>,
   "release": <дата_релиза>,
-  "file": <файл_трека>
 }
 ```
 
 **Примеры ответов:**
-- Статус 200 Created
+- Статус 200 OK
 - Статус 401 Unauthorized
 - Статус 403 Forrbiden
 - Статус 422 UnprocessableEntity
@@ -702,6 +692,7 @@ Authorization: Bearer <токен_доступа>
 ```
 
 **Примеры ответов:**
+- Статус 200 OK
 - Статус 204 NoContent
 - Статус 401 Unauthorized
 - Статус 403 Forrbiden

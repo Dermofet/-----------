@@ -70,9 +70,13 @@ func (m *musicInteractor) Create(ctx context.Context, musicParse *entity.MusicPa
 }
 
 func (m *musicInteractor) Update(ctx context.Context, id uuid.UUID, musicParse *entity.MusicParse) error {
-	fileType, err := utils.GetSupportedFileType(musicParse.FileHeader.Filename)
-	if err != nil {
-		return fmt.Errorf("/utils.GetSupportedFileType: %w", err)
+	var fileType utils.FileType = ""
+	var err error
+	if musicParse.FileHeader != nil {
+		fileType, err = utils.GetSupportedFileType(musicParse.FileHeader.Filename)
+		if err != nil {
+			return fmt.Errorf("/utils.GetSupportedFileType: %w", err)
+		}
 	}
 
 	err = m.repo.Update(ctx, id, musicParse, fileType)

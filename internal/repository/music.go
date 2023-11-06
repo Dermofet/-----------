@@ -91,6 +91,14 @@ func (m *musicRepository) Create(ctx context.Context, musicParse *entity.MusicPa
 		FileName: musicParse.FileHeader.Filename,
 	}
 
+	var err error
+	musicCreate.Size = uint64(musicParse.FileHeader.Size)
+
+	musicCreate.Duration, err = utils.GetAudioDuration(fileType, musicCreate.FilePath())
+	if err != nil {
+		return fmt.Errorf("/utils.GetAudioDuration: %w", err)
+	}
+
 	// скачиваем файл
 	download_file, err := os.Create(musicCreate.FilePath())
 	if err != nil {
@@ -101,13 +109,6 @@ func (m *musicRepository) Create(ctx context.Context, musicParse *entity.MusicPa
 
 	if _, err := io.Copy(download_file, musicParse.File); err != nil {
 		return fmt.Errorf("can't copy file: %w", err)
-	}
-	fmt.Println(musicParse.FileHeader.Size)
-	musicCreate.Size = uint64(musicParse.FileHeader.Size)
-
-	musicCreate.Duration, err = utils.GetAudioDuration(fileType, musicCreate.FilePath())
-	if err != nil {
-		return fmt.Errorf("/utils.GetAudioDuration: %w", err)
 	}
 
 	err = m.source.Create(ctx, musicCreate)
@@ -125,10 +126,17 @@ func (m *musicRepository) Update(ctx context.Context, id uuid.UUID, musicParse *
 		Release: musicParse.Release,
 	}
 
-	if musicParse.File != nil {
+	if musicParse.FileHeader != nil {
 		music, err := m.source.Get(ctx, id)
 		if err != nil {
 			return fmt.Errorf("/db/music.Get: %w", err)
+		}
+
+		musicUpdate.Size = uint64(musicParse.FileHeader.Size)
+
+		musicUpdate.Duration, err = utils.GetAudioDuration(fileType, musicUpdate.FilePath())
+		if err != nil {
+			return fmt.Errorf("/utils.GetAudioDuration: %w", err)
 		}
 
 		os.Remove(music.FilePath())
@@ -143,12 +151,6 @@ func (m *musicRepository) Update(ctx context.Context, id uuid.UUID, musicParse *
 			return fmt.Errorf("can't copy file: %w", err)
 		}
 		musicUpdate.FileName = musicParse.FileHeader.Filename
-		musicUpdate.Size = uint64(musicParse.FileHeader.Size)
-
-		musicUpdate.Duration, err = utils.GetAudioDuration(fileType, musicUpdate.FilePath())
-		if err != nil {
-			return fmt.Errorf("/utils.GetAudioDuration: %w", err)
-		}
 	}
 
 	err := m.source.Update(ctx, musicUpdate)
@@ -164,7 +166,7 @@ func (m *musicRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	if err != nil {
 		return fmt.Errorf("/db/music.Get: %w", err)
 	}
-	os.Remove("internal/storage/music_storage/" + music.FileName)
+	os.Remove(music.FilePath())
 
 	err = m.source.Delete(ctx, id)
 	if err != nil {
@@ -173,10 +175,3 @@ func (m *musicRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
-
-//Выдача файла, тут кривость, тк сделано через http, но мб по сути этого можно найти аналог на gin
-//Описание Header
-//w.Header().Set("Content-Disposition", "attachment; filename="+file.Name)
-//w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-//Отпавка файла
-//http.ServeFile(w, r, "internal/storage/files_storage/"+file.Name)

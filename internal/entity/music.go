@@ -23,12 +23,6 @@ type MusicParse struct {
 	FileHeader *multipart.FileHeader `swaggerignore:"true"`
 }
 
-type MusicCreate struct {
-	Name     string    `db:"name"`
-	Release  time.Time `db:"release_date"`
-	FileName string    `db:"file_name"`
-}
-
 type MusicDB struct {
 	Id       uuid.UUID `db:"id"`           // id трека
 	Name     string    `db:"name"`         // название трека
