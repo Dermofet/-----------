@@ -159,9 +159,6 @@ func (m *musicHandlers) Create(c *gin.Context) {
 	}
 
 	music.File, music.FileHeader, err = c.Request.FormFile("file")
-	if err.Error() == "http: no such file" {
-		err = nil
-	}
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
 		return
@@ -215,12 +212,11 @@ func (m *musicHandlers) Update(c *gin.Context) {
 	}
 
 	music.File, music.FileHeader, err = c.Request.FormFile("file")
-	if err.Error() == "http: no such file" {
-		err = nil
-	}
 	if err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
-		return
+		if err.Error() != "http: no such file" {
+			c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
+			return
+		}
 	}
 
 	err = m.interactor.Update(ctx, musicId, &music)
