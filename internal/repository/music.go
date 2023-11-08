@@ -166,10 +166,7 @@ func (m *musicRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	if err != nil {
 		return fmt.Errorf("/db/music.Get: %w", err)
 	}
-	err = os.Remove(music.FilePath())
-	if err != nil {
-		fmt.Errorf("can't delete music file %w", err)
-	}
+	os.Remove(music.FilePath())
 
 	err = m.source.Delete(ctx, id)
 	if err != nil {
