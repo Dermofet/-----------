@@ -111,13 +111,5 @@ func (u *userRepository) ShowLikedTracks(ctx context.Context, id uuid.UUID) ([]*
 		return nil, fmt.Errorf("/db/user.ShowLikedTracks: %w", err)
 	}
 
-	// musics := make([]*entity.Music, len(musicsDB))
-	// for i, musicDB := range musicsDB {
-	// 	musics[i] = &entity.Music{
-	// 		Id:   musicDB.Id,
-	// 		Name: musicDB.Name,
-	// 	}
-	// }
-
 	return musicsDB, nil
 }

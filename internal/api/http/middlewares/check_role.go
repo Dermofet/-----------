@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// The NewCheckAdminMiddleware function is a middleware that checks if the user is an admin.
 func NewCheckRoleMiddleware(roles []string, userInteractor usecase.UserInteractor) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId, exists := c.Get("user-id")

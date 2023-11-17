@@ -5,6 +5,8 @@ import (
 	"music-backend-test/internal/entity"
 )
 
+//go:generate mockgen -source=./interfaces.go -destination=./presenter_mock.go -package=presenter
+
 type Presenter interface {
 	ToUserView(user *entity.UserDB) *view.UserView
 	ToListUserView(users []*entity.UserDB) []*view.UserView

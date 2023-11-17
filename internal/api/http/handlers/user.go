@@ -42,13 +42,13 @@ func NewUserHandlers(interactor usecase.UserInteractor, presenter presenter.Pres
 func (h *userHandlers) GetMeHandler(c *gin.Context) {
 	ctx := context.Background()
 
-	userId, exists := c.Get("user-id")
+	userid_str, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	user, err := h.interactor.GetById(ctx, userId.(uuid.UUID))
+	user, err := h.interactor.GetById(ctx, uuid.MustParse(userid_str.(string)))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get user: %w", err))
 		return
@@ -99,7 +99,7 @@ func (h *userHandlers) UpdateMeHandler(c *gin.Context) {
 		return
 	}
 
-	dbUser, err := h.interactor.Update(ctx, userId.(uuid.UUID), &user)
+	dbUser, err := h.interactor.Update(ctx, uuid.MustParse(userId.(string)), &user)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't update user: %w", err))
 		return
@@ -135,7 +135,7 @@ func (h *userHandlers) DeleteMeHandler(c *gin.Context) {
 		return
 	}
 
-	err := h.interactor.Delete(ctx, userId.(uuid.UUID))
+	err := h.interactor.Delete(ctx, uuid.MustParse(userId.(string)))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.AbortWithStatus(http.StatusNotFound)
@@ -319,17 +319,13 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 		return
 	}
 
-	// TODO
-	// Изменил твой код
-	// Ты передавал id в body запроса
-	// Теперь он передается в path
 	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	err = h.interactor.LikeTrack(ctx, userId.(uuid.UUID), trackId)
+	err = h.interactor.LikeTrack(ctx, uuid.MustParse(userId.(string)), trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.LikeTrack: %w", err))
 		return
@@ -361,17 +357,13 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 		return
 	}
 
-	// TODO
-	// Изменил твой код
-	// Ты передавал id в body запроса
-	// Теперь он передается в path
 	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	err = h.interactor.DislikeTrack(ctx, userId.(uuid.UUID), trackId)
+	err = h.interactor.DislikeTrack(ctx, uuid.MustParse(userId.(string)), trackId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.DislikeTrack: %w", err))
 		return
@@ -396,13 +388,13 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	data, err := h.interactor.ShowLikedTracks(ctx, id.(uuid.UUID))
+	data, err := h.interactor.ShowLikedTracks(ctx, uuid.MustParse(userId.(string)))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.ShowLikedTracks: %w", err))
 		return
