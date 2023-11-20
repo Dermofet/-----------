@@ -20,7 +20,7 @@ import (
 )
 
 func MustMadeString(token *entity.Token) string {
-	t, err := token.String()
+	t, err := token.Token.SignedString([]byte("secret"))
 	if err != nil {
 		panic(err)
 	}
@@ -60,8 +60,6 @@ func Test_authHandlers_SignUp(t *testing.T) {
 				tokenView := &view.TokenView{
 					Token: MustMadeString(token),
 				}
-
-				fmt.Println(a.user)
 
 				f.interactor.EXPECT().GetByUsername(a.ctx, a.user.Username).Return(nil, nil)
 				f.interactor.EXPECT().Create(a.ctx, a.user).Return(userId, nil)

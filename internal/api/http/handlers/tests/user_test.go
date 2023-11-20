@@ -128,7 +128,7 @@ func Test_userHandlers_GetMeHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			if tc.args.id != uuid.Nil {
-				c.Set("user-id", tc.args.id.String())
+				c.Set("user-id", tc.args.id)
 			}
 
 			h.GetMeHandler(c)
@@ -270,7 +270,7 @@ func Test_userHandlers_UpdateMeHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			if tc.args.id != uuid.Nil {
-				c.Set("user-id", tc.args.id.String())
+				c.Set("user-id", tc.args.id)
 			}
 
 			tc.setup(tc.args, f, c)
@@ -375,7 +375,7 @@ func Test_userHandlers_DeleteMeHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			if tc.args.id != uuid.Nil {
-				c.Set("user-id", tc.args.id.String())
+				c.Set("user-id", tc.args.id)
 			}
 
 			tc.setup(tc.args, f, c)
@@ -432,7 +432,7 @@ func Test_userHandlers_GetByIdHandler(t *testing.T) {
 
 				f.interactor.EXPECT().GetById(a.ctx, a.id).Return(userDB, nil)
 				f.presenter.EXPECT().ToUserView(userDB).Return(userView)
-				c.Set("user-id", a.userId.String())
+				c.Set("user-id", a.id)
 
 				c.Request = httptest.NewRequest("GET", "/users/id", nil)
 				c.AddParam("id", a.id.String())
@@ -452,7 +452,7 @@ func Test_userHandlers_GetByIdHandler(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().GetById(a.ctx, a.id).Return(nil, fmt.Errorf("can't get user"))
-				c.Set("user-id", a.userId.String())
+				c.Set("user-id", a.id)
 
 				c.Request = httptest.NewRequest("GET", "/users/id", nil)
 				c.AddParam("id", a.id.String())
@@ -468,7 +468,7 @@ func Test_userHandlers_GetByIdHandler(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().GetById(a.ctx, a.id).Return(nil, nil)
-				c.Set("user-id", a.userId.String())
+				c.Set("user-id", a.id)
 
 				c.Request = httptest.NewRequest("GET", "/users/id", nil)
 				c.AddParam("id", a.id.String())
@@ -918,7 +918,7 @@ func Test_userHandlers_LikeTrack(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().LikeTrack(a.ctx, a.userID, a.trackID).Return(nil)
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 				c.AddParam("id", a.trackID.String())
 			},
 			expectedStatus: http.StatusOK,
@@ -932,7 +932,7 @@ func Test_userHandlers_LikeTrack(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().LikeTrack(a.ctx, a.userID, a.trackID).Return(fmt.Errorf("can't like track"))
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 				c.AddParam("id", a.trackID.String())
 			},
 			expectedStatus: http.StatusInternalServerError,
@@ -1006,7 +1006,7 @@ func Test_userHandlers_DislikeTrack(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().DislikeTrack(a.ctx, a.userID, a.trackID).Return(nil)
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 				c.AddParam("id", a.trackID.String())
 			},
 			expectedStatus: http.StatusOK,
@@ -1020,7 +1020,7 @@ func Test_userHandlers_DislikeTrack(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().DislikeTrack(a.ctx, a.userID, a.trackID).Return(fmt.Errorf("can't dislike track"))
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 				c.AddParam("id", a.trackID.String())
 			},
 			expectedStatus: http.StatusInternalServerError,
@@ -1126,7 +1126,7 @@ func Test_userHandlers_ShowLikedTracks(t *testing.T) {
 						Duration: "00:01:00",
 					},
 				})
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody: []*view.MusicView{
@@ -1152,7 +1152,7 @@ func Test_userHandlers_ShowLikedTracks(t *testing.T) {
 			},
 			setup: func(a args, f fields, c *gin.Context) {
 				f.interactor.EXPECT().ShowLikedTracks(a.ctx, a.userID).Return(nil, fmt.Errorf("can't show liked tracks"))
-				c.Set("user-id", a.userID.String())
+				c.Set("user-id", a.userID)
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   nil,

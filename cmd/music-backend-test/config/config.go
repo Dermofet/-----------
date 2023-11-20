@@ -2,14 +2,13 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"sync"
 
-	"github.com/jessevdk/go-flags"
+	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
 )
 
-const envfile = "dev/.env"
+const envfile = "./dev/.env"
 
 type Config struct {
 	LogLevel    string `long:"log-level" description:"Log level: panic, fatal, warn, debug, info" env:"LOG_LEVEL" default:"info"`
@@ -31,14 +30,9 @@ type Config struct {
 		Port int    `long:"http_port" description:"Post HTTP sever" env:"HTTP_PORT" required:"true" default:"80"`
 	}
 
-	GrpcServer struct {
-		Host string `long:"grcp_host" description:"Host gRCP server" env:"gRCP_HOST" required:"true" default:"0.0.0.0"`
-		Port int    `long:"grcp_port" description:"Port gRCP server" env:"gRCP_PORT" required:"true" default:"9000"`
-	}
-
 	DB struct {
 		Host     string `long:"db_host" description:"Host DB" env:"DB_HOST" required:"true" default:"127.0.0.1"`
-		Port     int    `long:"db_port" description:"Port DB" env:"DB_PORT" required:"true" default:"5432"`
+		Port     int    `long:"db_port" description:"Port DB" env:"INTERNAL_DB_PORT" required:"true" default:"5432"`
 		Name     string `long:"db_name" description:"Name DB" env:"DB_NAME" required:"true" default:"db"`
 		Username string `long:"db_username" description:"Username DB" env:"DB_USER" required:"true" default:"dbuser"`
 		Password string `long:"db_password" description:"Password DB" env:"DB_PASS" required:"true" default:"dbpass"`
@@ -52,27 +46,41 @@ var (
 )
 
 func newConfig() (*Config, error) {
-	godotenv.Load(envfile)
+	err := godotenv.Load(envfile)
+	if err != nil {
+		return nil, fmt.Errorf("error loading .env file: %v", err)
+	}
 
 	var cfg Config
-	parser := flags.NewParser(&cfg, flags.Default|flags.IgnoreUnknown)
-	_, err := parser.Parse()
+	err = env.Parse(&cfg)
 	if err != nil {
-		parser.WriteHelp(log.Writer())
-		return nil, fmt.Errorf("config parse failed: %v", err)
+		return nil, fmt.Errorf("error parse environment variables: %v", err)
+	}
+	err = env.Parse(&cfg.AppInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error parse environment variables: %v", err)
+	}
+	err = env.Parse(&cfg.HttpServer)
+	if err != nil {
+		return nil, fmt.Errorf("error parse environment variables: %v", err)
+	}
+	err = env.Parse(&cfg.DB)
+	if err != nil {
+		return nil, fmt.Errorf("error parse environment variables: %v", err)
 	}
 
 	return &cfg, nil
 }
 
 func GetAppConfig() (*Config, error) {
+	var err_ error
 	appConfigOnce.Do(func() {
 		config, err := newConfig()
 		if err != nil {
-			log.Fatalf("can't load config: %v", err)
+			err_ = fmt.Errorf("can't load config: %v", err)
 		}
 		appConfig = config
 	})
 
-	return appConfig, nil
+	return appConfig, err_
 }
