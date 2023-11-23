@@ -265,7 +265,7 @@ func (mr *MockMusicInteractorMockRecorder) GetAndSortByPopular(ctx interface{}) 
 }
 
 // Update mocks base method.
-func (m *MockMusicInteractor) Update(ctx context.Context, musicUpdate *entity.MusicParse) error {
+func (m *MockMusicInteractor) Update(ctx context.Context, id uuid.UUID, musicUpdate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
 	ret0, _ := ret[0].(error)
@@ -273,7 +273,7 @@ func (m *MockMusicInteractor) Update(ctx context.Context, musicUpdate *entity.Mu
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockMusicInteractorMockRecorder) Update(ctx, musicUpdate interface{}) *gomock.Call {
+func (mr *MockMusicInteractorMockRecorder) Update(ctx, id, musicUpdate interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicInteractor)(nil).Update), ctx, musicUpdate)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicInteractor)(nil).Update), ctx, id, musicUpdate)
 }
