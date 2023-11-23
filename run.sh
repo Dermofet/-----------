@@ -178,6 +178,10 @@ newmigrate() {
     migrate create -ext sql -dir ./internal/app/migrations -seq $MIGRATENAME
 }
 
+build_docker() {
+  docker compose -f ./dev/docker-compose.yml up -d --build
+}
+
 # Добавьте сюда список командx 
 using() {
   echo "Укажите команду при запуске: ./run.sh [command]"

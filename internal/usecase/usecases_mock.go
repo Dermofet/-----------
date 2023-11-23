@@ -267,7 +267,7 @@ func (mr *MockMusicInteractorMockRecorder) GetAndSortByPopular(ctx interface{}) 
 // Update mocks base method.
 func (m *MockMusicInteractor) Update(ctx context.Context, id uuid.UUID, musicUpdate *entity.MusicParse) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate)
+	ret := m.ctrl.Call(m, "Update", ctx, id, musicUpdate)
 	ret0, _ := ret[0].(error)
 	return ret0
 }

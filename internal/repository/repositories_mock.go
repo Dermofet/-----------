@@ -7,7 +7,7 @@ package repository
 import (
 	context "context"
 	entity "music-backend-test/internal/entity"
-	"music-backend-test/internal/utils"
+	utils "music-backend-test/internal/utils"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -186,7 +186,7 @@ func (m *MockMusicRepository) Create(ctx context.Context, musicCreate *entity.Mu
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockMusicRepositoryMockRecorder) Create(ctx, musicCreate interface{}, fileType interface{}) *gomock.Call {
+func (mr *MockMusicRepositoryMockRecorder) Create(ctx, musicCreate, fileType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMusicRepository)(nil).Create), ctx, musicCreate, fileType)
 }
@@ -268,13 +268,13 @@ func (mr *MockMusicRepositoryMockRecorder) GetAndSortByPopular(ctx interface{}) 
 // Update mocks base method.
 func (m *MockMusicRepository) Update(ctx context.Context, id uuid.UUID, musicUpdate *entity.MusicParse, fileType utils.FileType) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, musicUpdate, fileType)
+	ret := m.ctrl.Call(m, "Update", ctx, id, musicUpdate, fileType)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockMusicRepositoryMockRecorder) Update(ctx, id, musicUpdate interface{}, fileType interface{}) *gomock.Call {
+func (mr *MockMusicRepositoryMockRecorder) Update(ctx, id, musicUpdate, fileType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicRepository)(nil).Update), ctx, musicUpdate, fileType)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMusicRepository)(nil).Update), ctx, id, musicUpdate, fileType)
 }

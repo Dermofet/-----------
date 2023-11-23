@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"music-backend-test/internal/db"
 	"music-backend-test/internal/entity"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
@@ -86,7 +88,7 @@ func Test_source_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Errorf("can't connect to database: %v", err)
 				return
@@ -95,13 +97,7 @@ func Test_source_CreateUser(t *testing.T) {
 				db: mock,
 			}
 
-			s := &source{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
-
-			usersSource := &UserSourсe{
-				db: s.db,
-			}
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -201,7 +197,7 @@ func Test_source_GetUserById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Errorf("can't connect to database: %v", err)
 				return
@@ -210,13 +206,7 @@ func Test_source_GetUserById(t *testing.T) {
 				db: mock,
 			}
 
-			s := &source{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
-
-			usersSource := &UserSourсe{
-				db: s.db,
-			}
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -313,7 +303,7 @@ func Test_source_GetUserByUsername(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Errorf("can't connect to database: %v", err)
 				return
@@ -322,13 +312,7 @@ func Test_source_GetUserByUsername(t *testing.T) {
 				db: mock,
 			}
 
-			s := &source{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
-
-			usersSource := &UserSourсe{
-				db: s.db,
-			}
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -444,7 +428,7 @@ func Test_source_UpdateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Errorf("can't connect to database: %v", err)
 				return
@@ -453,13 +437,7 @@ func Test_source_UpdateUser(t *testing.T) {
 				db: mock,
 			}
 
-			s := &source{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
-
-			usersSource := &UserSourсe{
-				db: s.db,
-			}
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -533,7 +511,7 @@ func Test_source_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Errorf("can't connect to database: %v", err)
 				return
@@ -542,18 +520,297 @@ func Test_source_DeleteUser(t *testing.T) {
 				db: mock,
 			}
 
-			s := &source{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
-
-			usersSource := &UserSourсe{
-				db: s.db,
-			}
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
 			if err := usersSource.DeleteUser(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
 				t.Errorf("source.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_source_LikeTrack(t *testing.T) {
+	type fields struct {
+		db sqlmock.Sqlmock
+	}
+	type args struct {
+		ctx     context.Context
+		userId  uuid.UUID
+		trackId uuid.UUID
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    error
+		setup   func(a args, f fields)
+		wantErr bool
+	}{
+		{
+			name: "success: LikeTrack source: user likes track",
+			args: args{
+				ctx:     context.Background(),
+				userId:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				trackId: uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("INSERT INTO user_music (user_id, music_id) VALUES ($1, $2)").
+					WithArgs(
+						a.userId,
+						a.trackId,
+					).WillReturnRows(sqlmock.NewRows([]string{}))
+			},
+			wantErr: false,
+		},
+		{
+			name: "error: LikeTrack source: can't exec query",
+			args: args{
+				ctx:     context.Background(),
+				userId:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				trackId: uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("ABRA-CADABRA").
+					WithArgs(
+						a.userId,
+						a.trackId,
+					).WillReturnError(fmt.Errorf("can't exec query"))
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Errorf("can't connect to database: %v", err)
+				return
+			}
+			f := fields{
+				db: mock,
+			}
+
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
+
+			tt.setup(tt.args, f)
+
+			if err := usersSource.LikeTrack(tt.args.ctx, tt.args.userId, tt.args.trackId); (err != nil) != tt.wantErr {
+				t.Errorf("source.LikeTrack() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_source_DislikeTrack(t *testing.T) {
+	type fields struct {
+		db sqlmock.Sqlmock
+	}
+	type args struct {
+		ctx     context.Context
+		userId  uuid.UUID
+		trackId uuid.UUID
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    error
+		setup   func(a args, f fields)
+		wantErr bool
+	}{
+		{
+			name: "success: DislikeTrack source: user dislikes track",
+			args: args{
+				ctx:     context.Background(),
+				userId:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				trackId: uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("DELETE FROM user_music WHERE user_id = $1 AND music_id = $2").
+					WithArgs(
+						a.userId,
+						a.trackId,
+					).WillReturnRows(sqlmock.NewRows([]string{}))
+			},
+			wantErr: false,
+		},
+		{
+			name: "error: DislikeTrack source: can't exec query",
+			args: args{
+				ctx:     context.Background(),
+				userId:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+				trackId: uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("ABRA-CADABRA").
+					WithArgs(
+						a.userId,
+						a.trackId,
+					).WillReturnError(fmt.Errorf("can't exec query"))
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Errorf("can't connect to database: %v", err)
+				return
+			}
+			f := fields{
+				db: mock,
+			}
+
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
+
+			tt.setup(tt.args, f)
+
+			if err := usersSource.DislikeTrack(tt.args.ctx, tt.args.userId, tt.args.trackId); (err != nil) != tt.wantErr {
+				t.Errorf("source.DislikeTrack() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func MustParseTime(layout, value string) time.Time {
+	t, err := time.Parse(layout, value)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+func Test_source_ShowLikedTracks(t *testing.T) {
+	type fields struct {
+		db sqlmock.Sqlmock
+	}
+	type args struct {
+		ctx context.Context
+		id  uuid.UUID
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []*entity.MusicDB
+		setup   func(a args, f fields)
+		wantErr bool
+	}{
+		{
+			name: "success: ShowLikedTracks source: show user's liked track",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+			},
+			want: []*entity.MusicDB{
+				{
+					Id:       uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+					Name:     "name",
+					Release:  MustParseTime("2006-01-02", "2006-01-02"),
+					FileName: "file_name",
+					Size:     1000,
+					Duration: "duration",
+				},
+			},
+			setup: func(a args, f fields) {
+				rows := sqlmock.
+					NewRows([]string{
+						"id",
+						"name",
+						"release_date",
+						"file_name",
+						"size",
+						"duration",
+					}).AddRow(
+					uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+					"name",
+					MustParseTime("2006-01-02", "2006-01-02"),
+					"file_name",
+					"1000",
+					"duration",
+				)
+
+				f.db.ExpectQuery("SELECT music.* FROM music JOIN user_music ON music.id = user_music.music_id WHERE user_music.user_id = $1").
+					WithArgs(
+						a.id,
+					).WillReturnRows(rows)
+			},
+			wantErr: false,
+		},
+		{
+			name: "error: ShowLikedTracks source: can't exec query",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				f.db.ExpectQuery("ABRA-CADABRA").
+					WithArgs(
+						a.id,
+					).WillReturnError(fmt.Errorf("can't exec query"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "error: ShowLikedTracks source: can't scan rows",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.MustParse("4a6e104d-9d7f-45ff-8de6-37993d709522"),
+			},
+			want: nil,
+			setup: func(a args, f fields) {
+				rows := sqlmock.
+					NewRows([]string{
+						"id",
+						"name",
+						"release_date",
+						"file_name",
+						"size",
+						"duration",
+					}).AddRow(
+					uuid.MustParse("499afbff-7ff4-41e8-9f4d-9856669cca63"),
+					"name",
+					"puk-puk",
+					"file_name",
+					1000,
+					"duration",
+				)
+
+				f.db.ExpectQuery("SELECT music.* FROM music JOIN user_music ON music.id = user_music.music_id WHERE user_music.user_id = $1").
+					WithArgs(
+						a.id,
+					).WillReturnRows(rows).WillReturnError(fmt.Errorf("can't scan rows"))
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			source, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Errorf("can't connect to database: %v", err)
+				return
+			}
+			f := fields{
+				db: mock,
+			}
+
+			usersSource := db.NewUserSourсe(db.NewSource(sqlx.NewDb(source, "sqlmock")))
+
+			tt.setup(tt.args, f)
+
+			got, err := usersSource.ShowLikedTracks(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("source.ShowLikedTracks() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("source.ShowLikedTracks() = %v, want %v", got, tt.want)
 			}
 		})
 	}

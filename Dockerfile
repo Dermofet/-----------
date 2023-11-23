@@ -1,10 +1,27 @@
-FROM alpine:3.16
-RUN apk add --no-cache \
-    --repository http://dl-cdn.alpinelinux.org/alpine/v3.16/main \
-    tzdata zip ca-certificates
-RUN update-ca-certificates
-WORKDIR /root/
-COPY ./bin/go-template ./app
-ENV TIMEZONE=Europe/Moscow
-EXPOSE 8080
-CMD ["./app"]
+# Stage 1: Build stage
+FROM golang:1.21.3 AS builder
+
+WORKDIR /backend/
+
+COPY ./cmd /backend/cmd
+COPY ./internal /backend/internal
+COPY ./docs /backend/docs
+COPY ./dev /backend/dev
+
+RUN go mod init music-backend-test
+RUN go mod tidy
+
+RUN go build -o /backend/build ./cmd/music-backend-test/
+
+# Stage 2: Final stage
+FROM ubuntu:22.04
+
+WORKDIR /backend
+
+COPY --from=builder /backend/build /backend/build
+COPY --from=builder /backend/docs /backend/docs
+COPY --from=builder /backend/dev/.env /backend/dev/.env
+COPY --from=builder /backend/internal/storage /backend/internal/storage
+COPY --from=builder /backend/internal/app/migrations /backend/internal/app/migrations
+
+CMD [ "/backend/build" ]

@@ -319,10 +319,6 @@ func (h *userHandlers) LikeTrack(c *gin.Context) {
 		return
 	}
 
-	// TODO
-	// Изменил твой код
-	// Ты передавал id в body запроса
-	// Теперь он передается в path
 	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, err)
@@ -361,10 +357,6 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 		return
 	}
 
-	// TODO
-	// Изменил твой код
-	// Ты передавал id в body запроса
-	// Теперь он передается в path
 	trackId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusUnprocessableEntity, err)
@@ -396,13 +388,13 @@ func (h *userHandlers) DislikeTrack(c *gin.Context) {
 func (h *userHandlers) ShowLikedTracks(c *gin.Context) {
 	ctx := context.Background()
 
-	id, exists := c.Get("user-id")
+	userId, exists := c.Get("user-id")
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	data, err := h.interactor.ShowLikedTracks(ctx, id.(uuid.UUID))
+	data, err := h.interactor.ShowLikedTracks(ctx, userId.(uuid.UUID))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/user.ShowLikedTracks: %w", err))
 		return

@@ -17,5 +17,14 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "${HTTP_PORT}:8000"
+    depends_on:
+      - db
+
 volumes:
   pgdata:

@@ -106,7 +106,7 @@ func (u *UserSourсe) LikeTrack(ctx context.Context, userId uuid.UUID, trackId u
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := u.db.QueryRowxContext(dbCtx, "Insert into user_music (user_id, music_id) values ($1, $2)", userId.String(), trackId.String())
+	row := u.db.QueryRowxContext(dbCtx, "INSERT INTO user_music (user_id, music_id) VALUES ($1, $2)", userId.String(), trackId.String())
 	if row.Err() != nil {
 		return row.Err()
 	}
@@ -118,7 +118,7 @@ func (u *UserSourсe) DislikeTrack(ctx context.Context, userId uuid.UUID, trackI
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	row := u.db.QueryRowxContext(dbCtx, "Delete from user_music where user_id = $1 AND music_id = $2", userId.String(), trackId.String())
+	row := u.db.QueryRowxContext(dbCtx, "DELETE FROM user_music WHERE user_id = $1 AND music_id = $2", userId.String(), trackId.String())
 	if row.Err() != nil {
 		return row.Err()
 	}

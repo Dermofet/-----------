@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// The NewAuthMiddleware function is a middleware that handles authentication by checking for a valid
-// API key and JWT token in the Authorization header.
 func NewAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg, err := config.GetAppConfig()
