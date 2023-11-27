@@ -91,7 +91,7 @@ func (m *musicHandlers) GetAllSortByTime(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("/usecase/music.GetAllSortByTime: %w", err))
 		return
 	}
-	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics)) //Проверить вывод
+	c.JSON(http.StatusOK, m.presenter.ToListMusicView(musics))
 }
 
 // GetFileHandler godoc
@@ -113,7 +113,7 @@ func (m *musicHandlers) Get(c *gin.Context) {
 
 	musicId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't parse id: %w", err))
+		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't parse id: %w", err))
 		return
 	}
 

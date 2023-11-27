@@ -115,9 +115,9 @@ func (m *musicSource) Create(ctx context.Context, musicDb *entity.MusicDB) error
 	dbCtx, dbCancel := context.WithTimeout(ctx, QueryTimeout)
 	defer dbCancel()
 
-	newuuid := uuid.New()
+	musicDb.Id = uuid.New()
 	_, err := m.db.ExecContext(dbCtx, "INSERT INTO music (id, name, release_date, file_name, size, duration) VALUES ($1, $2, $3, $4, $5, $6)",
-		newuuid, musicDb.Name, musicDb.Release, musicDb.FileName, musicDb.Size, musicDb.Duration)
+		musicDb.Id, musicDb.Name, musicDb.Release, musicDb.FileName, musicDb.Size, musicDb.Duration)
 	if err != nil {
 		return fmt.Errorf("can't exec query: %w", err)
 	}

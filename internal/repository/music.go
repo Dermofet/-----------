@@ -91,14 +91,6 @@ func (m *musicRepository) Create(ctx context.Context, musicParse *entity.MusicPa
 		FileName: musicParse.FileHeader.Filename,
 	}
 
-	var err error
-	musicCreate.Size = uint64(musicParse.FileHeader.Size)
-
-	musicCreate.Duration, err = utils.GetAudioDuration(fileType, musicCreate.FilePath())
-	if err != nil {
-		return fmt.Errorf("/utils.GetAudioDuration: %w", err)
-	}
-
 	// скачиваем файл
 	download_file, err := os.Create(musicCreate.FilePath())
 	if err != nil {
@@ -109,6 +101,13 @@ func (m *musicRepository) Create(ctx context.Context, musicParse *entity.MusicPa
 
 	if _, err := io.Copy(download_file, musicParse.File); err != nil {
 		return fmt.Errorf("can't copy file: %w", err)
+	}
+
+	musicCreate.Size = uint64(musicParse.FileHeader.Size)
+
+	musicCreate.Duration, err = utils.GetAudioDuration(fileType, musicCreate.FilePath())
+	if err != nil {
+		return fmt.Errorf("/utils.GetAudioDuration: %w", err)
 	}
 
 	err = m.source.Create(ctx, musicCreate)
@@ -132,13 +131,6 @@ func (m *musicRepository) Update(ctx context.Context, id uuid.UUID, musicParse *
 			return fmt.Errorf("/db/music.Get: %w", err)
 		}
 
-		musicUpdate.Size = uint64(musicParse.FileHeader.Size)
-
-		musicUpdate.Duration, err = utils.GetAudioDuration(fileType, musicUpdate.FilePath())
-		if err != nil {
-			return fmt.Errorf("/utils.GetAudioDuration: %w", err)
-		}
-
 		os.Remove(music.FilePath())
 		download_file, err := os.Create(music.FilePath())
 		if err != nil {
@@ -150,6 +142,14 @@ func (m *musicRepository) Update(ctx context.Context, id uuid.UUID, musicParse *
 		if _, err := io.Copy(download_file, musicParse.File); err != nil {
 			return fmt.Errorf("can't copy file: %w", err)
 		}
+
+		musicUpdate.Size = uint64(musicParse.FileHeader.Size)
+
+		musicUpdate.Duration, err = utils.GetAudioDuration(fileType, musicUpdate.FilePath())
+		if err != nil {
+			return fmt.Errorf("/utils.GetAudioDuration: %w", err)
+		}
+
 		musicUpdate.FileName = musicParse.FileHeader.Filename
 	}
 
