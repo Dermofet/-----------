@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/repository"
-	"music-backend-test/internal/utils"
+	"music-backend-test/internal/usecase"
 	"os"
 	"syscall"
 	"testing"
@@ -97,7 +97,7 @@ func Test_GetAll(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
 			tt.setup(tt.args, f)
 
 			got, gotErr := musicUsecase.GetAll(tt.args.ctx)
@@ -175,7 +175,7 @@ func Test_Get(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
 			tt.setup(tt.args, f)
 
 			got, gotErr := musicUsecase.Get(tt.args.ctx, tt.args.musicId)
@@ -269,7 +269,7 @@ func Test_GetAndSortByPopular(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
 			tt.setup(tt.args, f)
 
 			got, gotErr := musicUsecase.GetAndSortByPopular(tt.args.ctx)
@@ -364,7 +364,7 @@ func Test_GetAllSortByTime(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
 			tt.setup(tt.args, f)
 
 			got, gotErr := musicUsecase.GetAllSortByTime(tt.args.ctx)
@@ -393,7 +393,7 @@ func Test_Create(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		setup   func(a args, f field, fileType utils.FileType)
+		setup   func(a args, f field)
 		wantErr bool
 	}{
 		{
@@ -410,8 +410,8 @@ func Test_Create(t *testing.T) {
 					},
 				},
 			},
-			setup: func(a args, f field, fileType utils.FileType) {
-				f.repository.EXPECT().Create(a.ctx, a.musicParse, fileType).Return(nil)
+			setup: func(a args, f field) {
+				f.repository.EXPECT().Create(a.ctx, a.musicParse).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -429,8 +429,8 @@ func Test_Create(t *testing.T) {
 					},
 				},
 			},
-			setup: func(a args, f field, fileType utils.FileType) {
-				f.repository.EXPECT().Create(a.ctx, a.musicParse, fileType).Return(fmt.Errorf("Error in repository Create"))
+			setup: func(a args, f field) {
+				f.repository.EXPECT().Create(a.ctx, a.musicParse).Return(fmt.Errorf("Error in repository Create"))
 			},
 			wantErr: true,
 		},
@@ -441,8 +441,8 @@ func Test_Create(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
-			tt.setup(tt.args, f, "MP3")
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
+			tt.setup(tt.args, f)
 
 			gotErr := musicUsecase.Create(tt.args.ctx, tt.args.musicParse)
 			if tt.wantErr == true {
@@ -467,7 +467,7 @@ func Test_Update(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		setup   func(a args, f field, fileType utils.FileType)
+		setup   func(a args, f field)
 		wantErr bool
 	}{
 		{
@@ -485,8 +485,8 @@ func Test_Update(t *testing.T) {
 					},
 				},
 			},
-			setup: func(a args, f field, fileType utils.FileType) {
-				f.repository.EXPECT().Update(a.ctx, a.musicId, a.parseMusic, fileType).Return(nil)
+			setup: func(a args, f field) {
+				f.repository.EXPECT().Update(a.ctx, a.musicId, a.parseMusic).Return(nil)
 			},
 		},
 		{
@@ -504,8 +504,8 @@ func Test_Update(t *testing.T) {
 					},
 				},
 			},
-			setup: func(a args, f field, fileType utils.FileType) {
-				f.repository.EXPECT().Update(a.ctx, a.musicId, a.parseMusic, fileType).Return(fmt.Errorf("Error in repositoty Update"))
+			setup: func(a args, f field) {
+				f.repository.EXPECT().Update(a.ctx, a.musicId, a.parseMusic).Return(fmt.Errorf("Error in repositoty Update"))
 			},
 			wantErr: true,
 		},
@@ -516,8 +516,8 @@ func Test_Update(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
-			tt.setup(tt.args, f, "MP3")
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
+			tt.setup(tt.args, f)
 
 			gotErr := musicUsecase.Update(tt.args.ctx, tt.args.musicId, tt.args.parseMusic)
 			if tt.wantErr == true {
@@ -573,7 +573,7 @@ func Test_Delete(t *testing.T) {
 			f := field{
 				repository: repository.NewMockMusicRepository(cntr),
 			}
-			musicUsecase := NewMusicInteractor(f.repository)
+			musicUsecase := usecase.NewMusicInteractor(f.repository)
 			tt.setup(tt.args, f)
 
 			gotErr := musicUsecase.Delete(tt.args.ctx, tt.args.musicId)

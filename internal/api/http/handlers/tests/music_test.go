@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"music-backend-test/internal/api/http/handlers"
 	"music-backend-test/internal/api/http/presenter"
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/usecase"
@@ -78,7 +79,7 @@ func Test_GetAll(t *testing.T) {
 			}
 			tt.setup(ctx, f)
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 
 			r := gin.New()
 			r.POST("/getall", musicHandler.GetAll)
@@ -148,7 +149,7 @@ func Test_Get(t *testing.T) { //Очень нужен код ревью
 				tt.setup(ctx, uuid.MustParse(tt.id), f)
 			}
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 
 			r := gin.New()
 			r.POST("/get/:id", musicHandler.Get)
@@ -224,7 +225,7 @@ func Test_GetAllSortByTime(t *testing.T) {
 			}
 			tt.setup(ctx, f)
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 
 			r := gin.New()
 			r.POST("/getSortByTime", musicHandler.GetAllSortByTime)
@@ -296,7 +297,7 @@ func Test_GetAndSortByPopular(t *testing.T) {
 			}
 			tt.setup(ctx, f)
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 
 			r := gin.New()
 			r.POST("/getSortByPopular", musicHandler.GetAndSortByPopular)
@@ -319,13 +320,13 @@ func Test_Create(t *testing.T) {
 	ctx := context.Background()
 	tests := []struct {
 		name       string
-		setup      func(ctx context.Context, musicCreate entity.MusicParse, f fields)
+		setup      func(ctx context.Context, musicCreate *entity.MusicParse, f fields)
 		inputBody  func(w *multipart.Writer)
 		wantStatus int
 	}{
 		{
 			name: "Create",
-			setup: func(ctx context.Context, musicCreate entity.MusicParse, f fields) {
+			setup: func(ctx context.Context, musicCreate *entity.MusicParse, f fields) {
 				f.usecase.EXPECT().Create(ctx, musicCreate).Return(nil)
 			},
 			inputBody: func(w *multipart.Writer) {
@@ -340,7 +341,7 @@ func Test_Create(t *testing.T) {
 				file, err := w.CreateFormFile("file", "Test.mp3")
 				assert.NoError(t, err)
 
-				data, err := os.Open("./internal/storage/music_storage/Test.mp3") //Неверный путь
+				data, err := os.Open("../../../../storage/music_storage/Test.mp3")
 				assert.NoError(t, err)
 				defer data.Close()
 				_, err = io.Copy(file, data)
@@ -352,7 +353,7 @@ func Test_Create(t *testing.T) {
 		},
 		{
 			name: "Error in usecase create",
-			setup: func(ctx context.Context, musicCreate entity.MusicParse, f fields) {
+			setup: func(ctx context.Context, musicCreate *entity.MusicParse, f fields) {
 				f.usecase.EXPECT().Create(ctx, musicCreate).Return(fmt.Errorf("Error in usecase create"))
 			},
 			inputBody: func(w *multipart.Writer) {
@@ -367,7 +368,7 @@ func Test_Create(t *testing.T) {
 				file, err := w.CreateFormFile("file", "Test.mp3")
 				assert.NoError(t, err)
 
-				data, err := os.Open("./internal/storage/music_storage/Test.mp3") //Неверный путь
+				data, err := os.Open("../../../../storage/music_storage/Test.mp3")
 				assert.NoError(t, err)
 				defer data.Close()
 				_, err = io.Copy(file, data)
@@ -387,14 +388,19 @@ func Test_Create(t *testing.T) {
 				usecase: usecase.NewMockMusicInteractor(ctrl),
 			}
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
-			tt.setup(ctx, entity.MusicParse{ //Несостыковка приходящих и статичных данных
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			tt.setup(ctx, &entity.MusicParse{ //Несостыковка приходящих и статичных данных
 				Name:    "Song2",
 				Release: time.Date(2021, time.November, 15, 0, 0, 0, 0, time.UTC),
-				File:    os.NewFile(uintptr(syscall.Stdout), "Test.mp3"),
+				File:    os.NewFile(uintptr(syscall.Stdout), "Test.MP3"),
 				FileHeader: &multipart.FileHeader{
 					Filename: "Test.mp3",
-					Size:     64,
+					// Header: map[Content-Disposition:[form-data; name="file"; filename="Test.mp3"],Content-Type:[application/octet-stream]],
+					Size: 3983661,
+					// content: [],
+					// tmpfile: "C:/Users/GOGICH~1/AppData/Local/Temp/multipart",
+					// tmpoff: -914339010 0,
+					// tmpshared: false,
 				},
 			}, f)
 
@@ -416,7 +422,7 @@ func Test_Create(t *testing.T) {
 	}
 }
 
-func Update(t *testing.T) {
+func Test_Update(t *testing.T) {
 	type fields struct {
 		usecase *usecase.MockMusicInteractor
 	}
@@ -446,7 +452,7 @@ func Update(t *testing.T) {
 				file, err := w.CreateFormFile("file", "Test.mp3")
 				assert.NoError(t, err)
 
-				data, err := os.Open("./internal/storage/music_storage/Test.mp3") //Неверный путь
+				data, err := os.Open("../../../../storage/music_storage/Test.mp3")
 				assert.NoError(t, err)
 				defer data.Close()
 				_, err = io.Copy(file, data)
@@ -479,7 +485,7 @@ func Update(t *testing.T) {
 				file, err := w.CreateFormFile("file", "Test.mp3")
 				assert.NoError(t, err)
 
-				data, err := os.Open("./internal/storage/music_storage/Test.mp3") //Неверный путь
+				data, err := os.Open("../../../../storage/music_storage/Test.mp3")
 				assert.NoError(t, err)
 				defer data.Close()
 				_, err = io.Copy(file, data)
@@ -499,7 +505,7 @@ func Update(t *testing.T) {
 				usecase: usecase.NewMockMusicInteractor(ctrl),
 			}
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 			if tt.setup != nil {
 				tt.setup(ctx, uuid.MustParse(tt.id), entity.MusicParse{ //Несостыковка приходящих и статичных данных
 					Name:    "Song2",
@@ -576,7 +582,7 @@ func Test_Delete(t *testing.T) {
 				tt.setup(ctx, uuid.MustParse(tt.id), f)
 			}
 
-			musicHandler := NewMusicHandlers(f.usecase, presenter.NewPresenter())
+			musicHandler := handlers.NewMusicHandlers(f.usecase, presenter.NewPresenter())
 
 			r := gin.New()
 			r.POST("/delete/:id", musicHandler.Delete)

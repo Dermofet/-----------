@@ -163,6 +163,7 @@ func (m *musicHandlers) Create(c *gin.Context) {
 		c.AbortWithError(http.StatusUnprocessableEntity, fmt.Errorf("can't read file: %w", err))
 		return
 	}
+	fmt.Println("\nFILE_HEADER: ", *music.FileHeader)
 
 	err = m.interactor.Create(ctx, &music)
 	if err != nil {

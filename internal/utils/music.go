@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"io"
-	"os"
 	"slices"
 	"strings"
 	"time"
@@ -18,7 +17,13 @@ const (
 	MP3     FileType = "MP3"
 )
 
-func GetSupportedFileType(filename string) (FileType, error) {
+type musicUtils struct{}
+
+func NewmusicUtils() *musicUtils {
+	return &musicUtils{}
+}
+
+func (mu *musicUtils) GetSupportedFileType(filename string) (FileType, error) {
 	// Преобразуйте расширение в нижний регистр, чтобы учесть все варианты (например, .MP3)
 	extension := strings.ToTitle(filename[strings.LastIndex(filename, ".")+1:])
 
@@ -31,10 +36,10 @@ func GetSupportedFileType(filename string) (FileType, error) {
 	return Invalid, fmt.Errorf("unsupported file type: %s", extension)
 }
 
-func GetAudioDuration(fileType FileType, filePath string) (string, error) {
+func (mu *musicUtils) GetAudioDuration(fileType FileType, filePath string, os FileSystem) (string, error) {
 	switch fileType {
 	case MP3:
-		res, err := getMP3Duration(filePath)
+		res, err := mu.getMP3Duration(filePath, os)
 		if err != nil {
 			return "", fmt.Errorf("can't get audio duration: %w", err)
 		}
@@ -55,8 +60,8 @@ func formatDuration(duration time.Duration) string {
 	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
-func getMP3Duration(filePath string) (float64, error) {
-	file, err := os.Open(filePath)
+func (mu *musicUtils) getMP3Duration(filePath string, filesystem FileSystem) (float64, error) {
+	file, err := filesystem.Open(filePath)
 	if err != nil {
 		return 0, fmt.Errorf("can't open file: %w", err)
 	}

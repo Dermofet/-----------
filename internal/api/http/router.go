@@ -10,6 +10,7 @@ import (
 	"music-backend-test/internal/entity"
 	"music-backend-test/internal/repository"
 	"music-backend-test/internal/usecase"
+	"music-backend-test/internal/utils"
 	"net/http"
 	"time"
 
@@ -99,7 +100,9 @@ func (r *router) registerRoutes() error {
 	musicSource := db.NewMusicSource(pgSource)
 
 	userRepository := repository.NewUserRepository(userSource)
-	musicRepository := repository.NewMusicRepository(musicSource)
+	osBackup := utils.NewFileSystem()
+	musicUtils := utils.NewmusicUtils()
+	musicRepository := repository.NewMusicRepository(musicSource, musicUtils, osBackup)
 
 	userInteractor := usecase.NewUserInteractor(userRepository)
 	musicInteractor := usecase.NewMusicInteractor(musicRepository)

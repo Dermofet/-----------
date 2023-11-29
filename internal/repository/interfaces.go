@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"music-backend-test/internal/entity"
-	"music-backend-test/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -25,7 +24,7 @@ type MusicRepository interface {
 	Get(ctx context.Context, musicId uuid.UUID) (*entity.MusicDB, error)
 	GetAndSortByPopular(ctx context.Context) ([]*entity.MusicDB, error)
 	GetAllSortByTime(ctx context.Context) ([]*entity.MusicDB, error)
-	Create(ctx context.Context, musicCreate *entity.MusicParse, fileType utils.FileType) error
-	Update(ctx context.Context, id uuid.UUID, musicUpdate *entity.MusicParse, fileType utils.FileType) error
+	Create(ctx context.Context, musicCreate *entity.MusicParse) error
+	Update(ctx context.Context, id uuid.UUID, musicUpdate *entity.MusicParse) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }

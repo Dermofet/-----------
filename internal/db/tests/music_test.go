@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"music-backend-test/internal/db"
 	"music-backend-test/internal/entity"
 	"testing"
 	"time"
@@ -94,17 +95,15 @@ func Test_source_GetAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -208,17 +207,15 @@ func Test_source_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -319,17 +316,15 @@ func Test_source_GetAndSortByPopular(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -427,17 +422,15 @@ func Test_source_GetAllSortByTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -524,17 +517,15 @@ func Test_source_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				sqlmock: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -630,17 +621,15 @@ func Test_source_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
@@ -696,17 +685,15 @@ func Test_source_Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			assert.NoError(t, err)
-			defer db.Close()
+			defer database.Close()
 
 			f := fields{
 				db: mock,
 			}
 
-			musicSource := &musicSource{
-				db: sqlx.NewDb(db, "sqlmock"),
-			}
+			musicSource := db.NewMusicSource(db.NewSource(sqlx.NewDb(database, "sqlmock")))
 
 			tt.setup(tt.args, f)
 
